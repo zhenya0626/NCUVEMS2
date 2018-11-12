@@ -1,0 +1,316 @@
+
+body{
+    background-color: #EAEAEA;
+    margin: 0;
+    font-family: serif;
+}
+header{
+    background-color: #388646;
+    height:36px;
+    padding:30px;
+    color: #FFF; font-size: 33px; font-weight: bold;
+}
+footer{
+    /*width: 100%;*/
+    background-color: #388646;
+    height:20px;
+    padding:30px;
+    color: #FFF; font-size: 10px; font-weight: bold;
+    text-align: right;
+    padding-right: 50px;
+}
+.main{
+    margin:30px auto;
+    /*width:1110px;*/
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.alert_area{
+    width: 100%;
+    margin: 0 1rem 1rem;
+    background: #fff;
+    border-top: 1rem solid rgb(230, 55, 55);
+    color: rgb(230, 55, 55);
+    padding: 1rem;
+    box-shadow: rgba(0, 0, 0, 0.2) 4px 4px 4px;
+}
+.display_none{
+    display: none;
+}
+.section{
+    /*float:left;*/
+    margin:50px 50px 25px;
+    box-shadow:4px 4px 4px rgba(0,0,0,0.2);
+    border-radius: 3px 3px 3px 3px;
+    height: 600px;
+    width:435px;
+    /* min-width: 348px; */
+}
+.section_title{
+    background-color: #388646;
+    height:6%;
+    color: white;
+    text-align: center;
+    border-radius: 3px 3px 0 0;
+    line-height: 34px;
+}
+.section_contents{
+    background-color: white;
+    height: 94%;
+    border-radius: 0 0 3px 3px;
+    position:relative;		
+}
+.room{
+    position: absolute;
+    top: 15%;
+    left: 5%;
+    width: 90%;
+    height: 72%;
+    border-radius: 10px;
+}
+.room div{
+    float:left;
+    background-color: #5A5858;
+    border:solid 1px #95989A;
+    color:#5A5858;
+    font-weight: bold;
+    font-size: 24px;
+    text-align: center;
+}
+#A203 .room div.door,#A202 .room div.door{
+    background-color: rgba(0,0,0,0);
+    width:20%;
+    height: 20%;
+}
+#A202 .room div.door1,#A203 .room div.door1{
+    border-radius: 0 0 55px 0;
+    position: absolute;
+    top: 10%;
+    left: 0%;
+
+}
+#A202 .room div.door2,#A203 .room div.door2{
+    border-radius: 0 55px 0 0;
+    position: absolute;
+    top: 70%;
+    left: 0%;
+
+}
+#factry .room div{
+    width:24.4%;
+    height:33.3%;
+    line-height: 147px;
+    position: relative;
+}
+#factry .room div.F1{
+    border-radius: 10px 0 0 0;		
+}
+#factry .room div.F3{
+    border-radius: 0 0 0 10px;		
+}
+#factry .room div.F10{
+    border-radius: 0 10px 0 0;		
+}
+#factry .room div.F12{
+    border-radius: 0 0 10px 0;		
+}
+#factry .room div#server_room{
+    background-color: #C4C4C4;
+    left: 24.5%;
+    top: 52%;
+    width: 73%;
+    height: 15%;
+    position: absolute;
+    line-height: 400%;
+    color:#797979;
+    font-size: 15px;
+}
+#factry .room div.F5,#factry .room div.F8,#factry .room div.F11{
+    line-height: 85px;
+}
+#A203 .room div{
+    width:100%;
+    height:100%;
+    line-height: 147px;
+    border-radius:10px; 
+
+}
+#A202 .room div{
+    width:32%;
+    height:66.6%;
+    line-height: 147px;
+}
+#A202 .room div.A202_1{
+    border-bottom: solid 1px #5a5858;
+    border-radius: 10px 0 0 0;
+}
+#A202 .room div.A202_2{
+    width:66.8%;
+    border-radius: 0 10px 0 0;
+}
+#A202 .room div.A202_3{
+    width: 99%;
+    height:33.3%;
+    border-top: none;
+    line-height: 147px;
+    border-radius: 0 0 10px 10px;
+}
+div.on{
+    background-color: #FFE760;
+    color:#FFE760;
+}
+div.alert{
+    background-color: rgb(230, 55, 55);;
+    color:rgb(230, 55, 55);
+}
+.room div.on img{
+    width:26px;
+    height:26px;
+    position: absolute;
+    display: inline-block;
+}
+img{
+    width:26px;
+    height:26px;
+    position: absolute;
+    display: none;
+}
+.canvas_rapper{
+    width: 80%;
+    margin:auto;
+    position: absolute;
+    top: 18%;
+    left:10%;
+}
+.w{
+    color: #5a5858;
+    text-align: center;
+    padding-top: 4%;
+}
+.legend{
+    display: flex;
+    justify-content: stretch;
+    position: absolute;
+    top: 90%;
+    left: 60%;
+    width: 25%;
+    border-radius: 10px;
+}
+.legend div{
+    background-color: #5A5858;
+    border:solid 1px #95989A;
+    color:#797979;
+    text-align: center;
+    width:50%;
+}
+.legend div.on{
+    background-color: #FFE760;
+    color:#ffffff;
+}
+#server_room{
+    font-size: 24px;
+}
+.enter{
+    position: absolute;
+    width: 34%;
+    height: 11.3%;
+    z-index: 9999;
+    background: #C4C4C4;
+    top: -18px;
+    text-align: center;
+    border-radius: 10px 0 0 0;
+    border: solid 1px #95989A;
+    color: #797979;
+    font-weight: 600;
+}
+.display_none{
+    display: none;
+}
+.change_mode {
+    position: absolute;
+    right: 3px;
+    cursor: pointer;
+    border: solid 1px RGBA(56,134,70, 1);
+    border-radius: 3px;
+    top: 3px;
+    background: #fff;
+}
+.scroll_wrapper{
+    box-sizing: border-box;
+    padding: 15px;
+    overflow-x: scroll;
+    margin-right: 15px;
+    margin-left: 15px;
+}
+
+
+.swiper-container {
+    width: 100%;
+    height: 100%;
+}
+.swiper-slide {
+    font-size: 18px;
+    height: 100%;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.swiper-container1 .swiper-slide { width: 100%; }
+
+
+
+    
+
+
+
+@media screen and (max-width: 1083px) {
+    /* タブレット・iPhone Pulus用のスタイル */
+    header{
+        height:75px;
+    }
+    .section {
+        margin: 10px auto;
+        box-shadow: 4px 4px 4px rgba(0,0,0,0.2);
+        border-radius: 3px 3px 3px 3px;
+        height: 500px;
+        width: 372px;
+        float: unset;
+    }
+    #factry .room div {
+        width: 24%;
+    }
+    #A202 .room div.A202_2 {
+        width: 66.5%;
+    }
+}
+
+@media screen and (max-width: 400px){
+    /* スマホとか用のスタイル */
+    header{
+        font-size: 15px;
+        text-align: center;
+    line-height: 36px;
+        padding: 0px;
+        height:36px;
+    }
+    .section{
+        width:95%;
+    }
+}
+
+
+@media screen and (max-width: 330px){
+    /* スマホとか用のスタイル */
+    header{
+        font-size: 15px;
+        text-align: center;
+    line-height: 36px;
+        padding: 0px;
+        height:36px;
+    }
+    .section{
+        width:95%;
+    }
+}
+
+
