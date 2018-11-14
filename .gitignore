@@ -26,3 +26,6 @@ coverage
 
 # Benchmarking
 benchmarks/graphs
+
+#dl8
+public/javascripts/dl8/*
