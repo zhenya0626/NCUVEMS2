@@ -129,7 +129,7 @@ const PostAlert = function () {
     let options = {
         host: 'ncuvems.sda.nagoya-cu.ac.jp',
         port: 443,
-        path: `/alert`,
+        path: `/push/alert`,
         method: 'POST',
     };
 

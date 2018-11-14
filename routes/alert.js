@@ -62,12 +62,7 @@ const multicastClientSendMessage = (users, SendMessageObject) => {
 };
 
 
-
-/*  POST webhook listing. */
 router.post('/', function(req, res, next) {
-
-
-
     let sql = `select userId from user;`;
     connection.query(sql, (err, rows, fields) => {
       if (err) throw err;
@@ -77,7 +72,36 @@ router.post('/', function(req, res, next) {
         userIdArray.push(element.userId);
       });
 
+    let SendMessageObject;   
+    SendMessageObject = [
+        {
+            type: 'text',
+            text: req.body.text,
+        },
+    ];
+    // multicastClientSendMessage(userIdArray, SendMessageObject)
+    multicastClientSendMessage(['Ud12eabeb5d98614b70d2edbbd9fc67be'], SendMessageObject)  //test
 
+    .then((body)=>{
+        console.log(body);
+    },(e)=>{console.log(e)});
+    });
+
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end('success');
+});
+
+
+router.post('/alert', function(req, res, next) {
+
+    let sql = `select userId from user;`;
+    connection.query(sql, (err, rows, fields) => {
+      if (err) throw err;
+      console.log('userId', rows);
+      let userIdArray = [];
+      rows.forEach(element => {
+        userIdArray.push(element.userId);
+      });
 
     let SendMessageObject;   
     SendMessageObject = [
@@ -123,5 +147,6 @@ router.post('/', function(req, res, next) {
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end('success');
 });
+
 
 module.exports = router;
