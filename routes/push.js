@@ -71,7 +71,7 @@ router.post('/', function(req, res, next) {
       rows.forEach(element => {
         userIdArray.push(element.userId);
       });
-
+    console.log('req', req.body.text);
     let SendMessageObject;   
     SendMessageObject = [
         {

@@ -9,6 +9,7 @@ var usersRouter = require('./routes/users');
 var webhookRouter = require('./routes/webhook');
 var pushRouter = require('./routes/push');
 var perminRouter = require('./routes/permin');
+var roomsRouter = require('./routes/rooms');
 var app = express();
 
 // view engine setup
@@ -26,6 +27,7 @@ app.use('/users', usersRouter);
 app.use('/webhook', webhookRouter);
 app.use('/push', pushRouter);
 app.use('/permin', perminRouter);
+app.use('/rooms', roomsRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
