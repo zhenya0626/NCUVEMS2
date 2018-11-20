@@ -43,7 +43,7 @@ router.get('/weekBar', function(req, res, next) {
     COALESCE(p2c3,0)+COALESCE(p2c4,0)+COALESCE(p3c1,0)+
     COALESCE(p3c2,0)+COALESCE(p3c3,0)+COALESCE(p3c4,0)+
     COALESCE(p4c1,0)+COALESCE(p4c2,0)+COALESCE(p4c3,0))*( 995 / 131.5)*(23.7 / 1000))) as weekBar 
-     from permin where year = ${year} and mon = ${mon} and day = ${day} group by day,dayOfTheWeek;`;
+    from permin where year = ${year} and mon = ${mon} and day = ${day} group by day,dayOfTheWeek;`;
     connection.query(sql, (err, rows, fields) => {
       if (err) throw err;
       if (i<=7) {
