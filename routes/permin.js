@@ -4,20 +4,15 @@ var router = express.Router();
 
 const mysql = require('mysql');
 const connection = mysql.createConnection({
-    host     : 'localhost',
-    user     : 'root',
-    password : 'F@1ryP3n9u1n',
-    database : 'vems'
+  host     : 'localhost',
+  user     : 'root',
+  password : 'F@1ryP3n9u1n',
+  database : 'vems'
 });
-
-
 connection.connect();
-
-
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-
   let sql = `select * from permin;`;
   connection.query(sql, (err, rows, fields) => {
     if (err) throw err;
