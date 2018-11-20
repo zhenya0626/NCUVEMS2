@@ -168,7 +168,7 @@ const PostAlert = function() {
   });
 };
 const setUserStateSql = (userId, state) => {
-  let setUserStateSql = `update user set state=${state} where id = ${userId};`;
+  let setUserStateSql = `update user set state=${state} where userId=${userId};`;
     connection.query(setUserStateSql, (err, rows, fields) => {
       if (err) throw err;
     });
@@ -235,7 +235,7 @@ router.post('/', function(req, res, next) {
       state_A202 = rows[0].state;
     });
     let user_state = 0;
-    let getUserStatusSql = `select state from user where id=${userId};`;
+    let getUserStatusSql = `select state from user where userId = ${userId};`;
     connection.query(getUserStatusSql, (err, rows, fields) => {
       if (err) throw err;
       console.log('state', rows); 
@@ -265,6 +265,7 @@ router.post('/', function(req, res, next) {
             replyOnlyTextMessage(WebhookEventObject, '現在はA202は消灯されているまたは授業中なので消さなくて大丈夫です');
             break;
           case 1: 
+            console.log('ここまでは来てる１');
             setUserStateSql(userId, 2);
             SendMessageObject = [{
               "type": "template",
