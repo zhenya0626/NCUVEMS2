@@ -168,7 +168,7 @@ const PostAlert = function() {
   });
 };
 const setUserStateSql = (userId, state) => {
-  let setUserStateSql = `update user set state=${state} where userId=${userId};`;
+  let setUserStateSql = `update user set state=${state} where userId='${userId}';`;
     connection.query(setUserStateSql, (err, rows, fields) => {
       if (err) throw err;
     });
@@ -180,7 +180,7 @@ const setAllUserStateSql = (state) => {
     });
 }
 const setRoomStateSql = (roomId, state) => {
-  let setRoomStateSql = `update room set state=${state} where id = ${roomId};`;
+  let setRoomStateSql = `update rooms set state=${state} where id = ${roomId};`;
     connection.query(setRoomStateSql, (err, rows, fields) => {
       if (err) throw err;
     });
@@ -227,177 +227,180 @@ router.post('/', function(req, res, next) {
     replyTokenArray.push(WebhookEventObject.replyToken);
     const userId = WebhookEventObject.source.userId;
     UIDArray.push(userId);
-    let state_A202 = 0;
+
     let getRoomStatusSql = `select state from rooms where name='A202';`;
     connection.query(getRoomStatusSql, (err, rows, fields) => {
       if (err) throw err;
       console.log('state', rows); 
-      state_A202 = rows[0].state;
-    });
-    let user_state = 0;
-    let getUserStatusSql = `select state from user where userId = ${userId};`;
-    connection.query(getUserStatusSql, (err, rows, fields) => {
-      if (err) throw err;
-      console.log('state', rows); 
-      user_state = rows[0].state;
-    });
-    if(WebhookEventObject.message.type === 'text'){
-      if (WebhookEventObject.message.text === '送信') {
-        PostAlert().then((body)=>{
-            console.log(body);
-        },(e)=>{console.log(e)});
-      } else if (WebhookEventObject.message.text === '消さない'){
-        switch(state_A202) {
-          case 0:
-            replyOnlyTextMessage(WebhookEventObject, '現在はA202は消灯されているまたは授業中なので消さなくて大丈夫です');
-            break;
-          case 1:
-          case 2:
-            setUserStateSql(userId, 1);
-            replyOnlyTextMessage(WebhookEventObject, 'ありがとうございました');
-            break;
-          default:
-            console.log('room status error');
-        }
-      }else if (WebhookEventObject.message.text === '消しに行く') {
-        switch(state_A202) {
-          case 0:
-            replyOnlyTextMessage(WebhookEventObject, '現在はA202は消灯されているまたは授業中なので消さなくて大丈夫です');
-            break;
-          case 1: 
-            console.log('ここまでは来てる１');
-            setUserStateSql(userId, 2);
-            SendMessageObject = [{
-              "type": "template",
-              "altText": "消した場合は『消した』 使っている人がいたなど消せなかった場合は『消せなかった』を選択してください",
-              "template": {
-                "type": "confirm",
-                "text": "消した場合は『消した』 使っている人がいたなど消せなかった場合は『消せなかった』を選択してください",
-                "actions": [
-                  {
-                    "type": "message",
-                    "label": "消せなかった",
-                    "text": "消せなかった"
-                  },
-                  {
-                    "type": "message",
-                    "label": "消した",
-                    "text": "消した"
+      let state_A202 = rows[0].state;
+
+      let getUserStatusSql = `select state from user where userId = '${userId}';`;
+      connection.query(getUserStatusSql, (err, rows, fields) => {
+        if (err) throw err;
+        console.log('state', rows); 
+        let user_state = rows[0].state;
+
+        if(WebhookEventObject.message.type === 'text'){
+          if (WebhookEventObject.message.text === '送信') {
+            PostAlert().then((body)=>{
+                console.log(body);
+            },(e)=>{console.log(e)});
+          } else if (WebhookEventObject.message.text === '消さない'){
+            switch(state_A202) {
+              case 0:
+                replyOnlyTextMessage(WebhookEventObject, '現在はA202は消灯されているまたは授業中なので消さなくて大丈夫です');
+                break;
+              case 1:
+              case 2:
+                setUserStateSql(userId, 1);
+                replyOnlyTextMessage(WebhookEventObject, 'ありがとうございました');
+                break;
+              default:
+                console.log('room status error');
+            }
+          }else if (WebhookEventObject.message.text === '消しに行く') {
+            switch(state_A202) {
+              case 0:
+                replyOnlyTextMessage(WebhookEventObject, '現在はA202は消灯されているまたは授業中なので消さなくて大丈夫です');
+                break;
+              case 1: 
+                console.log('ここまでは来てる１');
+                setUserStateSql(userId, 2);
+                SendMessageObject = [{
+                  "type": "template",
+                  "altText": "消した場合は『消した』 使っている人がいたなど消せなかった場合は『消せなかった』を選択してください",
+                  "template": {
+                    "type": "confirm",
+                    "text": "消した場合は『消した』 使っている人がいたなど消せなかった場合は『消せなかった』を選択してください",
+                    "actions": [
+                      {
+                        "type": "message",
+                        "label": "消せなかった",
+                        "text": "消せなかった"
+                      },
+                      {
+                        "type": "message",
+                        "label": "消した",
+                        "text": "消した"
+                      }
+                    ]
                   }
-                ]
-              }
+                  }];
+                  clientSendMessage(WebhookEventObject.replyToken, SendMessageObject)
+                  .then((body)=>{
+                    console.log(body);
+                  },(e)=>{console.log(e)});
+                break;
+              case 2:
+                replyOnlyTextMessage(WebhookEventObject, '現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にまた送信してください');
+                break;
+              default:
+                console.log('room status error');
+            }
+          } else if (WebhookEventObject.message.text === '消さないで') {
+            switch(state_A202) {
+              case 0:
+                replyOnlyTextMessage(WebhookEventObject, '現在はA202は消灯されているまたは授業中なので消さなくて大丈夫です');
+                break;
+              case 1:
+                setPointAndSendThanksMessage(WebhookEventObject, userId, 1);
+                multicastClientSendMessageExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
+                setRoomStateSql(1, 0);
+                setAllUserStateSql(0);
+                break;
+              case 2:
+                replyOnlyTextMessage(WebhookEventObject,'現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にまた送信してください');
+                break;
+              default:
+                console.log('room status error');
+            }
+          } else if (WebhookEventObject.message.text === '消した') {
+            switch(state_A202) {
+              case 0:
+                replyOnlyTextMessage(WebhookEventObject, '現在はA202は消灯されているまたは授業中なので消さなくて大丈夫です');
+                break;
+              case 1:
+                replyOnlyTextMessage(WebhookEventObject, 'ありがとうございます! 電気の消灯を確認しております。２分以内にポイントが付与されます。');
+                setUserStateSql(userId, 3);
+                setRoomStateSql(1, 2);
+                break;
+              case 2:
+                replyOnlyTextMessage(WebhookEventObject,'現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にまた送信してください');
+                break;
+              default:
+                console.log('room status error');
+            }
+          } else if (WebhookEventObject.message.text === '消せなかった') {
+            switch(state_A202) {
+              case 0:
+                replyOnlyTextMessage(WebhookEventObject, '現在はA202は消灯されているまたは授業中なので消さなくて大丈夫です');
+                break;
+              case 1:
+                setPointAndSendThanksMessage(WebhookEventObject, userId, 3);
+                multicastClientSendMessageExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
+                setRoomStateSql(1, 0);
+                setAllUserStateSql(0);
+                break;
+              case 2:
+                replyOnlyTextMessage(WebhookEventObject,'現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にまた送信してください');
+                break;
+              default:
+                console.log('room status error');
+            }
+          } else if (WebhookEventObject.message.text === 'やめる'){
+            switch(state_A202) {
+              case 0:
+                replyOnlyTextMessage(WebhookEventObject, '現在はA202は消灯されているまたは授業中なので消さなくて大丈夫です');
+                break;
+              case 1: 
+              case 2:
+                setUserStateSql(userId, 0);
+                replyOnlyTextMessage(WebhookEventObject, 'ありがとうございました');
+                break;
+              default:
+                console.log('room status error');
+            }
+    
+          } else if (WebhookEventObject.message.text === '登録'){
+            const userId = WebhookEventObject.source.userId; 
+            let displayName = '';
+            let pictureUrl = '';
+    
+            clientGetProfile(userId)
+            .then((body)=>{
+              let profile = JSON.parse(body); 
+              displayName = profile.displayName;
+              pictureUrl = profile.pictureUrl;
+              console.log('displayName', displayName);
+              console.log('pictureUrl', pictureUrl);
+      
+              let sql = `
+              insert into user (userid, replytoken, displayName, pictureUrl, count)
+              select * from
+              (select '${userId}','${WebhookEventObject.replyToken}','${displayName}','${pictureUrl}',0) as tmp
+              WHERE NOT EXISTS (select id from user where userid = '${userId}');`;
+              
+              connection.query(sql, (err, rows, fields) => {
+                if (err) throw err;
+                console.log('test_user', rows);
+              });
+      
+              SendMessageObject = [
+              {
+                type: 'text',
+                text: '登録完了しました。ありがとうございます。' //電気を消siniikuと+10 電気を消すと+10
               }];
               clientSendMessage(WebhookEventObject.replyToken, SendMessageObject)
               .then((body)=>{
                 console.log(body);
               },(e)=>{console.log(e)});
-            break;
-          case 2:
-            replyOnlyTextMessage(WebhookEventObject, '現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にまた送信してください');
-            break;
-          default:
-            console.log('room status error');
+            },(e)=>{console.log('getprofile noera-',e)});
+          }
         }
-      } else if (WebhookEventObject.message.text === '消さないで') {
-        switch(state_A202) {
-          case 0:
-            replyOnlyTextMessage(WebhookEventObject, '現在はA202は消灯されているまたは授業中なので消さなくて大丈夫です');
-            break;
-          case 1:
-            setPointAndSendThanksMessage(WebhookEventObject, userId, 1);
-            multicastClientSendMessageExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
-            setRoomStateSql(1, 0);
-            setAllUserStateSql(0);
-            break;
-          case 2:
-            replyOnlyTextMessage(WebhookEventObject,'現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にまた送信してください');
-            break;
-          default:
-            console.log('room status error');
-        }
-      } else if (WebhookEventObject.message.text === '消した') {
-        switch(state_A202) {
-          case 0:
-            replyOnlyTextMessage(WebhookEventObject, '現在はA202は消灯されているまたは授業中なので消さなくて大丈夫です');
-            break;
-          case 1:
-            replyOnlyTextMessage(WebhookEventObject, 'ありがとうございます! 電気の消灯を確認しております。２分以内にポイントが付与されます。');
-            setUserStateSql(userId, 3);
-            setRoomStateSql(1, 2);
-            break;
-          case 2:
-            replyOnlyTextMessage(WebhookEventObject,'現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にまた送信してください');
-            break;
-          default:
-            console.log('room status error');
-        }
-      } else if (WebhookEventObject.message.text === '消せなかった') {
-        switch(state_A202) {
-          case 0:
-            replyOnlyTextMessage(WebhookEventObject, '現在はA202は消灯されているまたは授業中なので消さなくて大丈夫です');
-            break;
-          case 1:
-            setPointAndSendThanksMessage(WebhookEventObject, userId, 3);
-            multicastClientSendMessageExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
-            setRoomStateSql(1, 0);
-            setAllUserStateSql(0);
-            break;
-          case 2:
-            replyOnlyTextMessage(WebhookEventObject,'現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にまた送信してください');
-            break;
-          default:
-            console.log('room status error');
-        }
-      } else if (WebhookEventObject.message.text === 'やめる'){
-        switch(state_A202) {
-          case 0:
-            replyOnlyTextMessage(WebhookEventObject, '現在はA202は消灯されているまたは授業中なので消さなくて大丈夫です');
-            break;
-          case 1: 
-          case 2:
-            setUserStateSql(userId, 0);
-            replyOnlyTextMessage(WebhookEventObject, 'ありがとうございました');
-            break;
-          default:
-            console.log('room status error');
-        }
-
-      } else if (WebhookEventObject.message.text === '登録'){
-        const userId = WebhookEventObject.source.userId; 
-        let displayName = '';
-        let pictureUrl = '';
-
-        clientGetProfile(userId)
-        .then((body)=>{
-          let profile = JSON.parse(body); 
-          displayName = profile.displayName;
-          pictureUrl = profile.pictureUrl;
-          console.log('displayName', displayName);
-          console.log('pictureUrl', pictureUrl);
-  
-          let sql = `
-          insert into user (userid, replytoken, displayName, pictureUrl, count)
-          select * from
-          (select '${userId}','${WebhookEventObject.replyToken}','${displayName}','${pictureUrl}',0) as tmp
-          WHERE NOT EXISTS (select id from user where userid = '${userId}');`;
-          
-          connection.query(sql, (err, rows, fields) => {
-            if (err) throw err;
-            console.log('test_user', rows);
-          });
-  
-          SendMessageObject = [
-          {
-            type: 'text',
-            text: '登録完了しました。ありがとうございます。' //電気を消siniikuと+10 電気を消すと+10
-          }];
-          clientSendMessage(WebhookEventObject.replyToken, SendMessageObject)
-          .then((body)=>{
-            console.log(body);
-          },(e)=>{console.log(e)});
-        },(e)=>{console.log('getprofile noera-',e)});
-      }
-    }
+      });
+    });
+    
+    
   }
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end('success');
