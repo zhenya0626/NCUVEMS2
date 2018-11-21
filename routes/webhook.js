@@ -110,7 +110,7 @@ const multicastClientSendMessageExceptForOne = (userId, textMessage) => {
         text: textMessage
       }];
       // multicastClientSendMessage(userIdArray, SendMessageObject)  //sousinnsitahitoigai
-      multicastClientSendMessage(['Ud12eabeb5d98614b70d2edbbd9fc67be'], SendMessageObject)  //test
+      multicastClientSendMessage(['Ud12eabeb5d98614b70d2edbbd9fc67be', 'U451892d8984210804955df6d5b32e8dd'], SendMessageObject)  //test
       .then((body)=>{
           console.log(body);
       },(e)=>{console.log(e)});
