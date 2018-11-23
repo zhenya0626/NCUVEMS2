@@ -60,6 +60,12 @@ const multicastClientSendMessage = (users, SendMessageObject) => {
     req.end();
   });
 };
+const setAlertedAt = () => {
+  let setAlertedAtSql = `update rooms set alerted_at=CURRENT_TIMESTAMP where name='A202';`;
+    connection.query(setAlertedAtSql, (err, rows, fields) => {
+      if (err) throw err;
+    });
+}
 
 
 router.post('/', function(req, res, next) {
@@ -91,7 +97,6 @@ router.post('/', function(req, res, next) {
   res.end('success');
 });
 
-
 router.post('/alert', function(req, res, next) {
 
   let sql = `select userId from user;`;
@@ -103,47 +108,44 @@ router.post('/alert', function(req, res, next) {
         userIdArray.push(element.userId);
     });
 
-  let SendMessageObject;   
-  SendMessageObject = [
-    {
-      type: 'text',
-      text: '大学内に電気の無駄遣いをしている部屋があります。URLを開いて部屋を確認してください！'
-    },
-    {
-      type: 'text',
-      text: 'https://ncuvems.sda.nagoya-cu.ac.jp'
-    },
-    {
-    "type": "template",
-    "altText": `確認した部屋の電気を消しに行く場合は『消しに行く』. 消さない場合は『消さない』を選択してください. その部屋を利用していて電気を消さないでほしい場合は『消さないで』とテキストで送信してください`,
-    "template": {
-      "type": "confirm",
-      "text": `確認した部屋の電気を消しに行く場合は『消しに行く』. 消さない場合は『消さない』を選択してください. その部屋を利用していて電気を消さないでほしい場合は『消さないで』とテキストで送信してください`,
-      "actions": [
-        {
-          "type": "message",
-          "label": "消さない",
-          "text": "消さない"
-        },
-        {
-          "type": "message",
-          "label": "消しに行く",
-          "text": "消しに行く"
+    let SendMessageObject;   
+    SendMessageObject = [
+      {
+        type: 'text',
+        text: '大学内に電気の無駄遣いをしている部屋があります。URLを開いて部屋を確認してください！'
+      },
+      {
+        type: 'text',
+        text: 'https://ncuvems.sda.nagoya-cu.ac.jp'
+      },
+      {
+        "type": "template",
+        "altText": `確認した部屋の電気を消しに行く場合は『消しに行く』. 消さない場合は『消さない』を選択してください. その部屋を利用していて電気を消さないでほしい場合は『消さないで』とテキストで送信してください`,
+        "template": {
+          "type": "confirm",
+          "text": `確認した部屋の電気を消しに行く場合は『消しに行く』. 消さない場合は『消さない』を選択してください. その部屋を利用していて電気を消さないでほしい場合は『消さないで』とテキストで送信してください`,
+          "actions": [
+            {
+              "type": "message",
+              "label": "消さない",
+              "text": "消さない"
+            },
+            {
+              "type": "message",
+              "label": "消しに行く",
+              "text": "消しに行く"
+            }
+          ]
         }
-      ]
-    }
-  },
-  ];
-  // multicastClientSendMessage(userIdArray, SendMessageObject)
-  multicastClientSendMessage(['Ud12eabeb5d98614b70d2edbbd9fc67be', 'U451892d8984210804955df6d5b32e8dd'], SendMessageObject)  //test
-
-  .then((body)=>{
-    console.log(body);
-  },(e)=>{console.log(e)});
-
+      },
+    ];
+    // multicastClientSendMessage(userIdArray, SendMessageObject)
+    multicastClientSendMessage(['Ud12eabeb5d98614b70d2edbbd9fc67be', 'U451892d8984210804955df6d5b32e8dd'], SendMessageObject)  //test
+    .then((body)=>{
+      console.log(body);
+      setAlertedAt();
+    },(e)=>{console.log(e)});
   });
-
-
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end('success');
 });
