@@ -21,7 +21,7 @@ const SIGNATURE = crypto.createHmac('sha256', CH_SECRET);
 const replyTokenArray = [];
 const UIDArray = [];
 
-const clientSendMessage = (replyToken, SendMessageObject) => {
+const replyMessageObject = (replyToken, SendMessageObject) => {
   let postDataStr = JSON.stringify({ replyToken: replyToken, messages: SendMessageObject });
   let options = {
     host: HOST,
@@ -58,12 +58,37 @@ const replyOnlyTextMessage = function (WebhookEventObject, textMessage) {
     type: 'text',
     text: textMessage,
   }];
-  clientSendMessage(WebhookEventObject.replyToken, SendMessageObject)
+  replyMessageObject(WebhookEventObject.replyToken, SendMessageObject)
   .then((body)=>{
     console.log(body);
   },(e)=>{console.log(e)});
 }
-const multicastClientSendMessage = (users, SendMessageObject) => {
+const setPointAndSendThanksMessage = (WebhookEventObject, userId, point) => {
+  let sql = `update user set count = count + ${point} where userId='${userId}';`;
+  connection.query(sql, (err, rows, fields) => {
+    if (err) throw err;
+    let sql2 = `select *, (select count(*) + 1 from user b where b.count > a.count) as ranking from user a where userId='${userId}';`;
+    connection.query(sql2, (err, rows, fields) => {
+      if (err) throw err;
+      SendMessageObject = [{
+          type: 'text',
+          text: 'ありがとうございます!!'
+      },{
+          type: 'text',
+          text: `ランキング ${rows[0].ranking}位　現在の獲得ポイントは${rows[0].count*10}Pです。`
+      },{
+          type: 'text',
+          text: 'https://ncuvems.sda.nagoya-cu.ac.jp'
+      }];
+      replyMessageObject(WebhookEventObject.replyToken, SendMessageObject)
+      .then((body)=>{
+          console.log(body);
+      },(e)=>{console.log(e)});
+    });
+  });
+}
+
+const multicastMessageObject = (users, SendMessageObject) => {
   let postDataStr = JSON.stringify({ to: users, messages: SendMessageObject });
   let options = {
     host: HOST,
@@ -93,7 +118,7 @@ const multicastClientSendMessage = (users, SendMessageObject) => {
     req.end();
   });
 };
-const multicastClientSendMessageExceptForOne = (userId, textMessage) => {
+const multicastMessageObjectExceptForOne = (userId, textMessage) => {
   let sql3 = `select userId from user;`;
   connection.query(sql3, (err, rows, fields) => {
     if (err) throw err;
@@ -109,13 +134,37 @@ const multicastClientSendMessageExceptForOne = (userId, textMessage) => {
         type: 'text',
         text: textMessage
       }];
-      // multicastClientSendMessage(userIdArray, SendMessageObject)  //sousinnsitahitoigai
-      multicastClientSendMessage(['Ud12eabeb5d98614b70d2edbbd9fc67be', 'U451892d8984210804955df6d5b32e8dd'], SendMessageObject)  //test
+      // multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
+      multicastMessageObject(['Ud12eabeb5d98614b70d2edbbd9fc67be', 'U451892d8984210804955df6d5b32e8dd'], SendMessageObject)  //test
       .then((body)=>{
           console.log(body);
       },(e)=>{console.log(e)});
   });
 }
+const PostAlert = function() {
+  let options = {
+    host: 'ncuvems.sda.nagoya-cu.ac.jp',
+    port: 443,
+    path: `/push/alert`,
+    method: 'POST',
+  };
+  return new Promise((resolve, reject) => {
+    let req = https.request(options, (res) => {
+      let body = '';
+      res.setEncoding('utf8');
+      res.on('data', (chunk) => {
+        body += chunk;
+      });
+      res.on('end', () => {
+        resolve(body);
+      });
+    });
+    req.on('error', (e) => {
+      reject(e);
+    });
+    req.end();
+  });
+};
 const clientGetProfile = (userId) => {
   let options = {
     host: HOST,
@@ -143,30 +192,7 @@ const clientGetProfile = (userId) => {
     req.end();
   });
 };
-const PostAlert = function() {
-  let options = {
-    host: 'ncuvems.sda.nagoya-cu.ac.jp',
-    port: 443,
-    path: `/push/alert`,
-    method: 'POST',
-  };
-  return new Promise((resolve, reject) => {
-    let req = https.request(options, (res) => {
-      let body = '';
-      res.setEncoding('utf8');
-      res.on('data', (chunk) => {
-        body += chunk;
-      });
-      res.on('end', () => {
-        resolve(body);
-      });
-    });
-    req.on('error', (e) => {
-      reject(e);
-    });
-    req.end();
-  });
-};
+
 const setUserStateSql = (userId, state) => {
   let setUserStateSql = `update user set state=${state} where userId='${userId}';`;
     connection.query(setUserStateSql, (err, rows, fields) => {
@@ -185,30 +211,7 @@ const setRoomStateSql = (roomId, state) => {
       if (err) throw err;
     });
 }
-const setPointAndSendThanksMessage = (WebhookEventObject, userId, point) => {
-  let sql = `update user set count = count + ${point} where userId='${userId}';`;
-  connection.query(sql, (err, rows, fields) => {
-    if (err) throw err;
-    let sql2 = `select *, (select count(*) + 1 from user b where b.count > a.count) as ranking from user a where userId='${userId}';`;
-    connection.query(sql2, (err, rows, fields) => {
-      if (err) throw err;
-      SendMessageObject = [{
-          type: 'text',
-          text: 'ありがとうございます!!'
-      },{
-          type: 'text',
-          text: `ランキング ${rows[0].ranking}位　現在の獲得ポイントは${rows[0].count*10}Pです。`
-      },{
-          type: 'text',
-          text: 'https://ncuvems.sda.nagoya-cu.ac.jp'
-      }];
-      clientSendMessage(WebhookEventObject.replyToken, SendMessageObject)
-      .then((body)=>{
-          console.log(body);
-      },(e)=>{console.log(e)});
-    });
-  });
-}
+
 
 
 /*  POST webhook listing. */
@@ -274,7 +277,7 @@ router.post('/', function(req, res, next) {
                 type: 'text',
                 text: '登録完了しました。ありがとうございます。' //電気を消siniikuと+10 電気を消すと+10
               }];
-              clientSendMessage(WebhookEventObject.replyToken, SendMessageObject)
+              replyMessageObject(WebhookEventObject.replyToken, SendMessageObject)
               .then((body)=>{
                 console.log(body);
               },(e)=>{console.log(e)});
@@ -311,13 +314,13 @@ router.post('/', function(req, res, next) {
                         ]
                       }
                     }];
-                    clientSendMessage(WebhookEventObject.replyToken, SendMessageObject)
+                    replyMessageObject(WebhookEventObject.replyToken, SendMessageObject)
                     .then((body)=>{
                       console.log(body);
                     },(e)=>{console.log(e)}); 
                   }else if (WebhookEventObject.message.text === '消さないで') {
                     setPointAndSendThanksMessage(WebhookEventObject, userId, 1);
-                    multicastClientSendMessageExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
+                    multicastMessageObjectExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
                     setRoomStateSql(1, 0);
                     setAllUserStateSql(0); 
                   }
@@ -330,7 +333,7 @@ router.post('/', function(req, res, next) {
                     setRoomStateSql(1, 2); 
                   }else if(WebhookEventObject.message.text === '消せなかった') {
                     setPointAndSendThanksMessage(WebhookEventObject, userId, 3);
-                    multicastClientSendMessageExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
+                    multicastMessageObjectExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
                     setRoomStateSql(1, 0);
                     setAllUserStateSql(0);
                   }else if('やめる'){
