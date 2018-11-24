@@ -282,7 +282,14 @@ router.post('/', function(req, res, next) {
                 console.log(body);
               },(e)=>{console.log(e)});
             },(e)=>{console.log('getprofile noera-',e)});
-          } else {
+          } else if (
+              WebhookEventObject.message.text === '消さない' ||
+              WebhookEventObject.message.text === '消しに行く' ||
+              WebhookEventObject.message.text === '消さないで' ||
+              WebhookEventObject.message.text === '消した' ||
+              WebhookEventObject.message.text === '消せなかった' ||
+              WebhookEventObject.message.text === 'やめる'
+            ) {
             switch(state_A202) {
               case 0:
                 replyOnlyTextMessage(WebhookEventObject, '現在はA202は消灯されているまたは授業中なので消さなくて大丈夫です');
@@ -370,6 +377,48 @@ router.post('/', function(req, res, next) {
           }
         }
       });
+    });
+  }else if (WebhookEventObject.type === 'follow'){
+    const userId = WebhookEventObject.source.userId; 
+    let displayName = '';
+    let pictureUrl = '';
+
+    clientGetProfile(userId)
+    .then((body)=>{
+      let profile = JSON.parse(body); 
+      displayName = profile.displayName;
+      pictureUrl = profile.pictureUrl;
+      console.log('displayName', displayName);
+      console.log('pictureUrl', pictureUrl);
+
+      let sql = `
+      insert into user (userid, replytoken, displayName, pictureUrl, count)
+      select * from
+      (select '${userId}','${WebhookEventObject.replyToken}','${displayName}','${pictureUrl}',0) as tmp
+      WHERE NOT EXISTS (select id from user where userid = '${userId}');`;
+      
+      connection.query(sql, (err, rows, fields) => {
+        if (err) throw err;
+        console.log('test_user', rows);
+      });
+
+      SendMessageObject = [
+      {
+        type: 'text',
+        text: '登録完了しました。ありがとうございます。' //電気を消siniikuと+10 電気を消すと+10
+      }];
+      replyMessageObject(WebhookEventObject.replyToken, SendMessageObject)
+      .then((body)=>{
+        console.log(body);
+      },(e)=>{console.log(e)});
+    },(e)=>{console.log('getprofile noera-',e)});
+  }else if (WebhookEventObject.type === 'unfollow'){
+    const userId = WebhookEventObject.source.userId;
+    let sql = `delete from user where userId='${userId}';`;
+    
+    connection.query(sql, (err, rows, fields) => {
+      if (err) throw err;
+      console.log('test_user', rows);
     });
   }
   res.writeHead(200, {'Content-Type': 'text/plain'});
