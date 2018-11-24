@@ -19,8 +19,6 @@ const MULTICAST_PATH = '/v2/bot/message/multicast';
 const CH_SECRET = 'bc7d4dcadfed59988d014082bd5a46ee'; //Channel Secretを指定
 const CH_ACCESS_TOKEN = 'lUZF7+QLCwbNu4dONhfI9V9Ov+BHIIYOT7LwAspY0+6rb/+AiNCfGR7tjtLUXzysKHiyxb81aYZQ4Mdl/WeWk1SofCWueoZtVH4SbKeMpKihhZRxwRsBb+MmuLwpzJBu1VYzdWf0R2FWbkOkqJMslAdB04t89/1O/w1cDnyilFU='; //Channel Access Tokenを指定
 const SIGNATURE = crypto.createHmac('sha256', CH_SECRET);
-const replyTokenArray = [];
-const UIDArray = [];
 
 
 /*
@@ -69,29 +67,16 @@ const setAlertedAt = () => {
 
 
 router.post('/', function(req, res, next) {
-  let sql = `select userId from user;`;
-  connection.query(sql, (err, rows, fields) => {
-    if (err) throw err;
-    console.log('userId', rows);
-    let userIdArray = [];
-    rows.forEach(element => {
-      userIdArray.push(element.userId);
-    });
-  console.log('req', req.body.text);
-  let SendMessageObject;   
-  SendMessageObject = [
-    {
-      type: 'text',
-      text: req.body.text,
-    },
-  ];
-  // multicastClientSendMessage(userIdArray, SendMessageObject)
-  multicastClientSendMessage(['Ud12eabeb5d98614b70d2edbbd9fc67be', 'U451892d8984210804955df6d5b32e8dd'], SendMessageObject)  //test
+  console.log('req.body', req.body);
 
-  .then((body)=>{
-      console.log(body);
-  },(e)=>{console.log(e)});
-  });
+  let SendMessageObject = req.body.SendMessageObject;  
+  let userIdArray = req.body.userIdArray;  
+
+    // multicastClientSendMessage(userIdArray, SendMessageObject)
+    multicastClientSendMessage(['Ud12eabeb5d98614b70d2edbbd9fc67be', 'U451892d8984210804955df6d5b32e8dd'], SendMessageObject)  //test
+    .then((body)=>{
+        console.log(body);
+    },(e)=>{console.log(e)});
 
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end('success');
