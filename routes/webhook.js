@@ -15,8 +15,10 @@ const HOST = 'api.line.me';
 const REPLY_PATH = '/v2/bot/message/reply';//リプライ用
 const PUSH_PATH = '/v2/bot/message/push';
 const MULTICAST_PATH = '/v2/bot/message/multicast';
-const CH_SECRET = 'bc7d4dcadfed59988d014082bd5a46ee'; //Channel Secretを指定
-const CH_ACCESS_TOKEN = 'lUZF7+QLCwbNu4dONhfI9V9Ov+BHIIYOT7LwAspY0+6rb/+AiNCfGR7tjtLUXzysKHiyxb81aYZQ4Mdl/WeWk1SofCWueoZtVH4SbKeMpKihhZRxwRsBb+MmuLwpzJBu1VYzdWf0R2FWbkOkqJMslAdB04t89/1O/w1cDnyilFU='; //Channel Access Tokenを指定
+const CH_SECRET_old = 'bc7d4dcadfed59988d014082bd5a46ee'; //Channel Secretを指定
+const CH_SECRET = 'c5cc40444c00f1059d17769575ad97b2'; //Channel Secretを指定
+const CH_ACCESS_TOKEN_old = 'lUZF7+QLCwbNu4dONhfI9V9Ov+BHIIYOT7LwAspY0+6rb/+AiNCfGR7tjtLUXzysKHiyxb81aYZQ4Mdl/WeWk1SofCWueoZtVH4SbKeMpKihhZRxwRsBb+MmuLwpzJBu1VYzdWf0R2FWbkOkqJMslAdB04t89/1O/w1cDnyilFU='; //Channel Access Tokenを指定
+const CH_ACCESS_TOKEN = 'saYoa7C1X1OjCgNMYv9aVbS6un73bMXRaHWgcw/ODHCLES7sxXsGmJaI22fyo8DCl3XmI77uvhVDo6LQXlOtXIzCmGuHqXmE1o1uIaNOPEvtqxIACdNG3QX0KuXnkZl+/td/EbZh3Jis4POpYVFqYQdB04t89/1O/w1cDnyilFU='; //Channel Access Tokenを指定
 const SIGNATURE = crypto.createHmac('sha256', CH_SECRET);
 const replyTokenArray = [];
 const UIDArray = [];
