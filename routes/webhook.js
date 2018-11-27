@@ -354,8 +354,8 @@ router.post('/', function(req, res, next) {
                       replyMessageObject(WebhookEventObject.replyToken, SendMessageObject)
                       .then((body)=>{
                         console.log(body);
-                        setUserStateSql(userId, 2);
-                        setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, 2, memo_log);
+                        setUserStateSql(userId, 1);
+                        setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, 1, memo_log);
                       },(e)=>{console.log(e)}); 
                     }else if (WebhookEventObject.message.text === '消しに行く') {    
                       SendMessageObject = [{
