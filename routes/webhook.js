@@ -316,26 +316,48 @@ router.post('/', function(req, res, next) {
                 },(e)=>{console.log(e)});
               },(e)=>{console.log('getprofile noera-',e)});
             } else if (
-                WebhookEventObject.message.text === '消さない' ||
+                WebhookEventObject.message.text === '行かない' ||
                 WebhookEventObject.message.text === '消しに行く' ||
-                WebhookEventObject.message.text === '消さないで' ||
+                WebhookEventObject.message.text === '使用中だから' ||
                 WebhookEventObject.message.text === '消した' ||
                 WebhookEventObject.message.text === '消せなかった' ||
-                WebhookEventObject.message.text === 'やめる'
+                WebhookEventObject.message.text === 'それ以外'
               ) {
               switch(state_A202) {
                 case 0:
                   replyOnlyTextMessage(WebhookEventObject, '現在は消灯されているまたは授業中なので消さなくて大丈夫です');
+                  setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
                   break;
                 case 1:
                   if(user_state === 0) {
-                    if (WebhookEventObject.message.text === '消さない'){
-                      setUserStateSql(userId, 1);
-                      replyOnlyTextMessage(WebhookEventObject, 'ありがとうございます'); 
-                      setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, 1, memo_log);
-
-                    }else if (WebhookEventObject.message.text === '消しに行く') {
-                      setUserStateSql(userId, 2);
+                    if (WebhookEventObject.message.text === '行かない'){
+                      SendMessageObject = [{
+                        "type": "template",
+                        "altText": "電気を消しに行かない理由を教えてください",
+                        "template": {
+                          "type": "confirm",
+                          "text": "電気を消しに行かない理由を教えてください",
+                          "actions": [
+                            {
+                              "type": "message",
+                              "label": "使用中だから",
+                              "text": "使用中だから"
+                            },
+                            {
+                              "type": "message",
+                              "label": "それ以外",
+                              "text": "それ以外"
+                            }
+                          ]
+                        }
+                      }];
+                      replyMessageObject(WebhookEventObject.replyToken, SendMessageObject)
+                      .then((body)=>{
+                        console.log(body);
+                        setUserStateSql(userId, 2);
+                        setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, 2, memo_log);
+                      },(e)=>{console.log(e)}); 
+                    }else if (WebhookEventObject.message.text === '消しに行く') {    
                       SendMessageObject = [{
                         "type": "template",
                         "altText": "消した場合は『消した』 使っている人がいたなど消せなかった場合は『消せなかった』を選択してください",
@@ -359,20 +381,27 @@ router.post('/', function(req, res, next) {
                       replyMessageObject(WebhookEventObject.replyToken, SendMessageObject)
                       .then((body)=>{
                         console.log(body);
+                        setUserStateSql(userId, 2);
                         setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, 2, memo_log);
-
                       },(e)=>{console.log(e)}); 
-                    }else if (WebhookEventObject.message.text === '消さないで') {
-                      setPointAndSendThanksMessage(WebhookEventObject, userId, 1);
-                      multicastMessageObjectExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
-                      setRoomStateSql(1, 0);
-                      setAllUserStateSql(0);
-                      setLog(type_log, `${message_log}`, userId_log, 1, 0, 0, 0, memo_log);
-                    
                     }else {
                       setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
                     }
                   } else if (user_state === 1) {
+                    if (WebhookEventObject.message.text === '使用中だから') {
+                      setPointAndSendThanksMessage(WebhookEventObject, userId, 1);
+                      multicastMessageObjectExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
+                      setRoomStateSql(1, 0);
+                      setAllUserStateSql(0);
+                      setLog(type_log, `${message_log}`, userId_log, 1, 0, 1, 0, memo_log);
+                    
+                    } else if('それ以外'){
+                      setUserStateSql(userId, 0);
+                      replyOnlyTextMessage(WebhookEventObject, 'ありがとうございました');
+                      setLog(type_log, `${message_log}`, userId_log, 1, 1, 2, 0, memo_log);
+                    } else {
+                      setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
+                    }
                     setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
                   } else if (user_state === 2) {
                     if (WebhookEventObject.message.text === '消した'){
@@ -388,12 +417,6 @@ router.post('/', function(req, res, next) {
                       setAllUserStateSql(0);
                       setLog(type_log, `${message_log}`, userId_log, 1, 0, 2, 0, memo_log);
 
-                    }else if('やめる'){
-                      setUserStateSql(userId, 0);
-                      replyOnlyTextMessage(WebhookEventObject, 'ありがとうございました');
-
-                      setLog(type_log, `${message_log}`, userId_log, 1, 1, 2, 0, memo_log);
-
                     }else {
                       setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
                     }
@@ -402,48 +425,9 @@ router.post('/', function(req, res, next) {
                   }
                   break;
                 case 2:
-                  if(user_state === 0) {
-                    if (WebhookEventObject.message.text === '消さない'){
-                      setUserStateSql(userId, 1);
-                      replyOnlyTextMessage(WebhookEventObject, 'ありがとうございます'); 
-                      setLog(type_log, `${message_log}`, userId_log, 2, 2, 0, 1, memo_log);
-                      user_state_next_log = 1;
-                    }else if ((WebhookEventObject.message.text === '消しに行く')) {
-                      replyOnlyTextMessage(WebhookEventObject,'現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にご確認ください。');
-                      setLog(type_log, `${message_log}`, userId_log, 2, 2, 0, 0, memo_log);
-
-                    } else if ((WebhookEventObject.message.text === '消さないで')) {
-                      replyOnlyTextMessage(WebhookEventObject,'現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にご確認ください。');
-                      setLog(type_log, `${message_log}`, userId_log, 2, 2, 0, 0, memo_log);
-                    } else {
-                      setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
-                    }
-                  }else if (user_state === 1) {
-                    //スルー
-                  }else if (user_state === 2) {
-                    if (WebhookEventObject.message.text === 'やめる'){
-                      setUserStateSql(userId, 0);
-                      user_state_next_log = 0;
-                      replyOnlyTextMessage(WebhookEventObject, 'ありがとうございました'); 
-                      setLog(type_log, `${message_log}`, userId_log, 2, 2, 2, 2, memo_log);
-
-                    }else if (WebhookEventObject.message.text === '消した') {
-                      replyOnlyTextMessage(WebhookEventObject,'現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にご確認ください。');
-                      setLog(type_log, `${message_log}`, userId_log, 2, 2, 2, 2, memo_log);
-
-                    }else if (WebhookEventObject.message.text === '消せなかった') {
-                      replyOnlyTextMessage(WebhookEventObject,'現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にご確認ください。');
-                      setLog(type_log, `${message_log}`, userId_log, 2, 2, 2, 2, memo_log);
-
-                    } else {
-                      setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
-                    }
-                  }else if (user_state === 3) {
-                    replyOnlyTextMessage(WebhookEventObject, '現在点灯状況の確認中です。お待ちください。');
-                    setLog(type_log, `${message_log}`, userId_log, 2, 2, 3, 3, memo_log);
-                  } else {
-                    setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
-                  }
+                  replyOnlyTextMessage(WebhookEventObject,'現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にご確認ください。');
+                  setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
+                  break;
                 default:
                   console.log('room status error');
               }
