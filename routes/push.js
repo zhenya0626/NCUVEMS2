@@ -74,8 +74,8 @@ router.post('/', function(req, res, next) {
   let SendMessageObject = req.body.SendMessageObject;
   let userIdArray = req.body.userIdArray;  
 
-    // multicastClientSendMessage(userIdArray, SendMessageObject)
-    multicastClientSendMessage(['U48d9b4ecccdca65e7b3f44a6910b48af'], SendMessageObject)  //test
+    multicastClientSendMessage(userIdArray, SendMessageObject)
+    // multicastClientSendMessage(['U48d9b4ecccdca65e7b3f44a6910b48af'], SendMessageObject)  //test
     .then((body)=>{
         console.log(body);
     },(e)=>{console.log(e)});
@@ -126,8 +126,8 @@ router.post('/alert', function(req, res, next) {
         }
       },
     ];
-    // multicastClientSendMessage(userIdArray, SendMessageObject)
-    multicastClientSendMessage(['U48d9b4ecccdca65e7b3f44a6910b48af'], SendMessageObject)  //test
+    multicastClientSendMessage(userIdArray, SendMessageObject)
+    // multicastClientSendMessage(['U48d9b4ecccdca65e7b3f44a6910b48af'], SendMessageObject)  //test
     .then((body)=>{
       console.log(body);
       setAlertedAt();

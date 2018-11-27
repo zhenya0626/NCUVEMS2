@@ -137,8 +137,8 @@ const multicastMessageObjectExceptForOne = (userId, textMessage) => {
         type: 'text',
         text: textMessage
       }];
-      // multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
-      multicastMessageObject(['U48d9b4ecccdca65e7b3f44a6910b48af'], SendMessageObject)  //test
+      multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
+      // multicastMessageObject(['U48d9b4ecccdca65e7b3f44a6910b48af'], SendMessageObject)  //test
       .then((body)=>{
           console.log(body);
       },(e)=>{console.log(e)});

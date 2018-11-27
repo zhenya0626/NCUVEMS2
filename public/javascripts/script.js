@@ -26,38 +26,38 @@ function isClassTime() {
     };
     // 2=ka
     if(dayOfWeek === 2) {
-        if ( hour>=9 && (hour<=10 && minute<=30) ){
+        if ( hour==9 && (hour==10 && minute<=30) ){
             tmpObj.A202 = true;
-            tmpObj.A203 = true;
-        } else if ( (hour>=10  && minute>=40)&& (hour<=12 && minute<=10) ) {
+            // tmpObj.A203 = true;
+        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10) ) {
             tmpObj.A202 = true;
-            tmpObj.A203 = true;
-        } else if ( (hour>=13  && minute>=0)&& (hour<=14 && minute<=30) ) {
+            // tmpObj.A203 = true;
+        } else if ( hour=13 || (hour==14 && minute<=30) ) {
 
-        } else if ( (hour>=14  && minute>=40)&& (hour<=16 && minute<=10) ) {
+        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
 
         }
     // 3=sui
     } else if(dayOfWeek === 3) {
-        if ( hour>=9 && (hour<=10 && minute<=30) ){
+        if ( hour==9 && (hour==10 && minute<=30) ){
+            // tmpObj.A203 = true;
+        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10) ) {  
             tmpObj.A203 = true;
-        } else if ( (hour>=10  && minute>=40)&& (hour<=12 && minute<=10) ) {  
-            tmpObj.A203 = true;
-        } else if ( (hour>=13  && minute>=0)&& (hour<=14 && minute<=30) ) {
+        } else if ( hour=13 || (hour==14 && minute<=30) ) {
             tmpObj.A202 = true;
-            tmpObj.A203 = true;
-        } else if ( (hour>=14  && minute>=40)&& (hour<=16 && minute<=10) ) {
-            tmpObj.A203 = true;
+            // tmpObj.A203 = true;
+        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
+            // tmpObj.A203 = true;
         }  
     // 4=moku 
     } else if(dayOfWeek === 3) {
-        if ( hour>=9 && (hour<=10 && minute<=30) ){
+        if ( hour==9 && (hour==10 && minute<=30) ){
 
-        } else if ( (hour>=10  && minute>=40)&& (hour<=12 && minute<=10) ) {  
+        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10) ) {  
 
-        } else if ( (hour>=13  && minute>=0)&& (hour<=14 && minute<=30) ) {
+        } else if ( hour=13 || (hour==14 && minute<=30) ) {
             tmpObj.A202 = true;
-        } else if ( (hour>=14  && minute>=40)&& (hour<=16 && minute<=10) ) {
+        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
             tmpObj.A202 = true;
         }   
     }
@@ -143,13 +143,13 @@ function onoff() {
         
         if (aiArray[i] > 0) {
             $(".room div.CH" + (i + 1) + "").addClass("on");
-            if(i < 2 && !isClassTime().A203){
+            if(i < 2 && !isClassTime().A202){
                 $(".room div.CH1").addClass("alert");
                 $(".room div.CH2").addClass("alert");
                 A202_ai += aiArray[i];
             }
-            if(i === 2 && !isClassTime().A202){
-                $(".room div.CH3").addClass("alert");
+            if(i === 2 && !isClassTime().A203){
+                // $(".room div.CH3").addClass("alert");s
                 A203_ai += aiArray[i];
             }
 
@@ -175,7 +175,7 @@ function onoff() {
         }
     }
     // if(A202_ai+A203_ai+factory_ai>0){  
-    if(A202_ai+A203_ai>0){  
+    if(A202_ai>0){  
         $("#alert_area").removeClass("display_none");
         if(A202_ai>0){    
             $("#alert_area_text_A202").removeClass("display_none"); 
@@ -183,7 +183,7 @@ function onoff() {
             $("#alert_area_text_A202").addClass("display_none");
         }
         if(A203_ai>0){
-            $("#alert_area_text_A203").removeClass("display_none");
+            // $("#alert_area_text_A203").removeClass("display_none");
         } else {
             $("#alert_area_text_A203").addClass("display_none");
         }

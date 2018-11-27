@@ -33,11 +33,11 @@ router.get('/weekBar', function(req, res, next) {
     year = tmpdate.getFullYear();    
     mon = tmpdate.getMonth()+1;
     day = tmpdate.getDate() ;	
-    let sql = `select day,dayOfTheWeek,sum(ROUND(COALESCE(p1c1,0)+COALESCE(p1c2,0)+
-    COALESCE(p1c3,0)+(COALESCE(p1c4,0)+COALESCE(p2c1,0)+COALESCE(p2c2,0)+
-    COALESCE(p2c3,0)+COALESCE(p2c4,0)+COALESCE(p3c1,0)+
-    COALESCE(p3c2,0)+COALESCE(p3c3,0)+COALESCE(p3c4,0)+
-    COALESCE(p4c1,0)+COALESCE(p4c2,0)+COALESCE(p4c3,0))*( 995 / 131.5)*(23.7 / 1000))) as weekBar 
+    let sql = `select day,dayOfTheWeek,sum(ROUND(COALESCE(ai1,0)+COALESCE(ai2,0)+
+    COALESCE(ai3,0)+(COALESCE(ai4,0)+COALESCE(ai5,0)+COALESCE(ai6,0)+
+    COALESCE(ai7,0)+COALESCE(ai8,0)+COALESCE(ai9,0)+
+    COALESCE(ai10,0)+COALESCE(ai11,0)+COALESCE(ai12,0)+
+    COALESCE(ai13,0)+COALESCE(ai14,0)+COALESCE(ai15,0))*( 995 / 131.5)*(23.7 / 1000))) as weekBar 
     from permin where year = ${year} and mon = ${mon} and day = ${day} group by day,dayOfTheWeek;`;
     connection.query(sql, (err, rows, fields) => {
       if (err) throw err;
@@ -61,11 +61,11 @@ router.get('/log', function(req, res, next) {
     factory: [],
   }
   let sql = `select CONCAT(mon,'/',day,' ',hour,':', min) as time,
-  ROUND(COALESCE(p1c1,0)*( 995 / 131.5)*(23.7 / 1000),1) as A202,
-  ROUND((COALESCE(p1c2,0)+COALESCE(p1c3,0))*( 995 / 131.5)*(23.7 / 1000),1) as A203,
-  ROUND((COALESCE(p1c4,0)+COALESCE(p2c1,0)+COALESCE(p2c2,0)+COALESCE(p2c3,0)+
-    COALESCE(p2c4,0)+COALESCE(p3c1,0)+COALESCE(p3c2,0)+COALESCE(p3c3,0)+
-    COALESCE(p3c4,0)+COALESCE(p4c1,0)+COALESCE(p4c2,0)+COALESCE(p4c3,0)
+  ROUND(COALESCE(ai1,0)*( 995 / 131.5)*(23.7 / 1000),1) as A202,
+  ROUND((COALESCE(ai2,0)+COALESCE(ai3,0))*( 995 / 131.5)*(23.7 / 1000),1) as A203,
+  ROUND((COALESCE(ai4,0)+COALESCE(ai5,0)+COALESCE(ai6,0)+COALESCE(ai7,0)+
+    COALESCE(ai8,0)+COALESCE(ai9,0)+COALESCE(ai10,0)+COALESCE(ai11,0)+
+    COALESCE(ai12,0)+COALESCE(ai13,0)+COALESCE(ai14,0)+COALESCE(ai15,0)
     )*( 995 / 131.5)*(23.7 / 1000),1) as factory from permin order by id desc limit 1000;`;
   connection.query(sql, (err, rows, fields) => {
     if (err) throw err;
@@ -112,11 +112,11 @@ router.get('/compare/', function(req, res, next) {
     }
   };
   let sql = `select CONCAT(hour,':', min) as time,
-  ROUND(COALESCE(p1c1,0)*( 995 / 131.5)*(23.7 / 1000),1) as A202,
-  ROUND((COALESCE(p1c2,0)+COALESCE(p1c3,0))*( 995 / 131.5)*(23.7 / 1000),1) as A203,
-  ROUND((COALESCE(p1c4,0)+COALESCE(p2c1,0)+COALESCE(p2c2,0)+COALESCE(p2c3,0)+
-    COALESCE(p2c4,0)+COALESCE(p3c1,0)+COALESCE(p3c2,0)+COALESCE(p3c3,0)+
-    COALESCE(p3c4,0)+COALESCE(p4c1,0)+COALESCE(p4c2,0)+COALESCE(p4c3,0))*( 995 / 131.5)*(23.7 / 1000),1) as factory
+  ROUND(COALESCE(ai1,0)*( 995 / 131.5)*(23.7 / 1000),1) as A202,
+  ROUND((COALESCE(ai2,0)+COALESCE(ai3,0))*( 995 / 131.5)*(23.7 / 1000),1) as A203,
+  ROUND((COALESCE(ai4,0)+COALESCE(ai5,0)+COALESCE(ai6,0)+COALESCE(ai7,0)+
+    COALESCE(ai8,0)+COALESCE(ai9,0)+COALESCE(ai10,0)+COALESCE(ai11,0)+
+    COALESCE(ai12,0)+COALESCE(ai13,0)+COALESCE(ai14,0)+COALESCE(ai15,0))*( 995 / 131.5)*(23.7 / 1000),1) as factory
   from permin where year = ${year} and mon = ${mon} and day = ${day};`;
   connection.query(sql, (err, rows, fields) => {
     if (err) throw err;
@@ -131,11 +131,11 @@ router.get('/compare/', function(req, res, next) {
 
 
   let sql2 =  `select CONCAT(hour,':', min) as time,
-  ROUND(COALESCE(p1c1,0)*( 995 / 131.5)*(23.7 / 1000),1) as A202,
-  ROUND((COALESCE(p1c2,0)+COALESCE(p1c3,0))*( 995 / 131.5)*(23.7 / 1000),1) as A203,
-  ROUND((COALESCE(p1c4,0)+COALESCE(p2c1,0)+COALESCE(p2c2,0)+COALESCE(p2c3,0)+
-    COALESCE(p2c4,0)+COALESCE(p3c1,0)+ COALESCE(p3c2,0)+COALESCE(p3c3,0)+
-    COALESCE(p3c4,0)+COALESCE(p4c1,0)+COALESCE(p4c2,0)+COALESCE(p4c3,0))*( 995 / 131.5)*(23.7 / 1000),1) as factory
+  ROUND(COALESCE(ai1,0)*( 995 / 131.5)*(23.7 / 1000),1) as A202,
+  ROUND((COALESCE(ai2,0)+COALESCE(ai3,0))*( 995 / 131.5)*(23.7 / 1000),1) as A203,
+  ROUND((COALESCE(ai4,0)+COALESCE(ai5,0)+COALESCE(ai6,0)+COALESCE(ai7,0)+
+    COALESCE(ai8,0)+COALESCE(ai9,0)+ COALESCE(ai10,0)+COALESCE(ai11,0)+
+    COALESCE(ai12,0)+COALESCE(ai13,0)+COALESCE(ai14,0)+COALESCE(ai15,0))*( 995 / 131.5)*(23.7 / 1000),1) as factory
   from permin where year = ${lastWeek_year} and mon = ${lastWeek_mon} and day = ${lastWeek_day};`;
   connection.query(sql2, (err, rows, fields) => {
     if (err) throw err;
