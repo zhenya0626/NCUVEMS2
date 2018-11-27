@@ -214,6 +214,12 @@ const setRoomStateSql = (roomId, state) => {
       if (err) throw err;
     });
 }
+const changeRoomConfirm = function (roomId, confirm) {
+  let setUserStateSql = `update rooms set confirm=${confirm} where id=${roomId};`;
+  connection.query(setUserStateSql, (err, rows, fields) => {
+      if (err) throw err;
+  });
+};
 
 const setLog = (type, message, userId, room_state_prev, room_state_next, user_state_prev, user_state_next, memo='') => {
 
@@ -393,6 +399,7 @@ router.post('/', function(req, res, next) {
                       multicastMessageObjectExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
                       setRoomStateSql(1, 0);
                       setAllUserStateSql(0);
+                      changeRoomConfirm(1,0);
                       setLog(type_log, `${message_log}`, userId_log, 1, 0, 1, 0, memo_log);
                     
                     } else if('それ以外'){
@@ -415,6 +422,7 @@ router.post('/', function(req, res, next) {
                       multicastMessageObjectExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
                       setRoomStateSql(1, 0);
                       setAllUserStateSql(0);
+                      changeRoomConfirm(1,0);
                       setLog(type_log, `${message_log}`, userId_log, 1, 0, 2, 0, memo_log);
 
                     }else {
