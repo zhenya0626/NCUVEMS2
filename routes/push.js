@@ -114,8 +114,8 @@ router.post('/alert', function(req, res, next) {
           "actions": [
             {
               "type": "message",
-              "label": "消さない",
-              "text": "消さない"
+              "label": "消しに行く",
+              "text": "消しに行く"
             },
             {
               "type": "message",
