@@ -1,4 +1,4 @@
-let room = {};
+
 let compare = {};
 let logData = {};
 let weekBar = {};
@@ -111,27 +111,6 @@ function Turned_Off_Time() {
         }   
     }
     return tmpObj
-}
-async function fetchRoom() {
-    $.ajax({
-        url:`https://ncuvems.sda.nagoya-cu.ac.jp/rooms/1/`,
-        type:'GET',
-        async: false
-    })
-    // Ajaxリクエストが成功した時発動
-    .done( (data) => {
-        // $('#alert_area').html(data);
-        room = data;
-        console.log('room', room);
-    })
-    // Ajaxリクエストが失敗した時発動
-    .fail( (data) => {
-        console.log('error', data);
-    })
-    // Ajaxリクエストが成功・失敗どちらでも発動
-    .always( (data) => {
-        
-    });
 }
 async function fetchCompare() {
     $.ajax({
