@@ -25,15 +25,21 @@ router.get('/', function(req, res, next) {
     res.send(rows);
   });
 });
+router.post('/:id', function(req, res, next) {
+  let sql = `select * from rooms where id = ${req.params.id};`;
+  connection.query(sql, (err, rows, fields) => {
+    if (err) throw err;
+    console.log('*', rows);
+    res.send(rows);
+  });
+});
 router.post('/:id/state', function(req, res, next) {
-
     let sql = `update rooms set state = ${req.body.state} where id = ${req.params.id};`;
   connection.query(sql, (err, rows, fields) => {
     if (err) throw err;
     console.log('*', rows);
     res.send(rows);
   });
-
 });
 
 

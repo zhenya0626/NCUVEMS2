@@ -318,7 +318,6 @@ router.post('/', function(req, res, next) {
             if (err) throw err;
             console.log('state', rows); 
             let user_state = rows[0].state;
-           
             user_state_prev_log = user_state;
             user_state_next_log = user_state;
             type_log = WebhookEventObject.type;

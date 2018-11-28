@@ -30,7 +30,7 @@ router.get('/weekBar', function(req, res, next) {
   dayOfWeek = (dayOfWeek === 0)? 7:dayOfWeek;
   tmpdate.setDate(tmpdate.getDate() - (7 + dayOfWeek -1));
   for (let i = 1; i <= (7 + dayOfWeek); i++) {
-    year = tmpdate.getFullYear();    
+    year = tmpdate.getFullYear(); 
     mon = tmpdate.getMonth()+1;
     day = tmpdate.getDate() ;	
     let sql = `select day,dayOfTheWeek,sum(ROUND(COALESCE(ai1,0)+COALESCE(ai2,0)+
