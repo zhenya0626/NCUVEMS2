@@ -60,45 +60,6 @@ const multicastClientSendMessage = (users, SendMessageObject) => {
     req.end();
   });
 };
-const pushClientSendMessage = (SendMessageObject) => {
-
-  let postDataStr = JSON.stringify({messages: SendMessageObject });
-  let options = {
-    host: HOST,
-    port: 443,
-    path: PUSH_PATH,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': `Bearer ${CH_ACCESS_TOKEN}`,
-    }
-  };
-
-  return new Promise((resolve, reject) => {
-    let req = https.request(options, (res) => {
-      let body = '';
-      res.setEncoding('utf8');
-      res.on('data', (chunk) => {
-        body += chunk;
-      });
-      res.on('end', () => {
-        resolve(body);
-      });
-    });
-
-    req.on('error', (e) => {
-      reject(e);
-    });
-    req.write(postDataStr);
-    req.end();
-  });
-};
-const setAlertedAt = () => {
-  let setAlertedAtSql = `update rooms set alerted_at=CURRENT_TIMESTAMP where name='A202';`;
-    connection.query(setAlertedAtSql, (err, rows, fields) => {
-      if (err) throw err;
-    });
-}
 
 
 router.post('/', function(req, res, next) {
