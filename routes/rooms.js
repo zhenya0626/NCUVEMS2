@@ -30,7 +30,7 @@ router.post('/:id', function(req, res, next) {
   connection.query(sql, (err, rows, fields) => {
     if (err) throw err;
     console.log('*', rows);
-    res.send(rows);
+    res.send(rows[0]);
   });
 });
 router.post('/:id/state', function(req, res, next) {

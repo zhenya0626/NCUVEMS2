@@ -1,4 +1,4 @@
-
+let room = {};
 let compare = {};
 let logData = {};
 let weekBar = {};
@@ -7,6 +7,7 @@ let weekBar = {};
 function tm() {
     // tm = setInterval("location.reload()",1000*10);
     onoff();
+    fetchRoom();
     fetchCompare();
     fetchLog();
     fetchWeekBar();
@@ -73,44 +74,29 @@ function Turned_Off_Time() {
         A203: false,
         factry: false
     };
-    // 2=ka
-    if(dayOfWeek === 2) {
-        if ( hour==9 && (hour==10 && minute<=30) ){
-            tmpObj.A202 = true;
-            // tmpObj.A203 = true;
-        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10) ) {
-            tmpObj.A202 = true;
-            // tmpObj.A203 = true;
-        } else if ( hour=13 || (hour==14 && minute<=30) ) {
-
-        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
-
-        }
-    // 3=sui
-    } else if(dayOfWeek === 3) {
-        if ( hour==9 && (hour==10 && minute<=30) ){
-            // tmpObj.A203 = true;
-        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10) ) {  
-            tmpObj.A203 = true;
-        } else if ( hour=13 || (hour==14 && minute<=30) ) {
-            tmpObj.A202 = true;
-            // tmpObj.A203 = true;
-        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
-            // tmpObj.A203 = true;
-        }  
-    // 4=moku 
-    } else if(dayOfWeek === 3) {
-        if ( hour==9 && (hour==10 && minute<=30) ){
-
-        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10) ) {  
-
-        } else if ( hour=13 || (hour==14 && minute<=30) ) {
-            tmpObj.A202 = true;
-        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
-            tmpObj.A202 = true;
-        }   
-    }
+    // room.alerted_at
     return tmpObj
+}
+async function fetchRoom() {
+    $.ajax({
+        url:`https://ncuvems.sda.nagoya-cu.ac.jp/rooms/1/`,
+        type:'GET',
+        async: false
+    })
+    // Ajaxリクエストが成功した時発動
+    .done( (data) => {
+        // $('#alert_area').html(data);
+        room = data;
+        console.log('room', room);
+    })
+    // Ajaxリクエストが失敗した時発動
+    .fail( (data) => {
+        console.log('error', data);
+    })
+    // Ajaxリクエストが成功・失敗どちらでも発動
+    .always( (data) => {
+        
+    });
 }
 async function fetchCompare() {
     $.ajax({
