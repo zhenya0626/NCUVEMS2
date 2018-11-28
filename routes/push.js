@@ -11,7 +11,7 @@ const connection = mysql.createConnection({
 });
 connection.connect();
 
-
+let test = true;
 const HOST = 'api.line.me'; 
 const REPLY_PATH = '/v2/bot/message/reply';//リプライ用
 const PUSH_PATH = '/v2/bot/message/push';
@@ -60,6 +60,39 @@ const multicastClientSendMessage = (users, SendMessageObject) => {
     req.end();
   });
 };
+const pushClientSendMessage = (SendMessageObject) => {
+
+  let postDataStr = JSON.stringify({messages: SendMessageObject });
+  let options = {
+    host: HOST,
+    port: 443,
+    path: PUSH_PATH,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': `Bearer ${CH_ACCESS_TOKEN}`,
+    }
+  };
+
+  return new Promise((resolve, reject) => {
+    let req = https.request(options, (res) => {
+      let body = '';
+      res.setEncoding('utf8');
+      res.on('data', (chunk) => {
+        body += chunk;
+      });
+      res.on('end', () => {
+        resolve(body);
+      });
+    });
+
+    req.on('error', (e) => {
+      reject(e);
+    });
+    req.write(postDataStr);
+    req.end();
+  });
+};
 const setAlertedAt = () => {
   let setAlertedAtSql = `update rooms set alerted_at=CURRENT_TIMESTAMP where name='A202';`;
     connection.query(setAlertedAtSql, (err, rows, fields) => {
@@ -74,11 +107,17 @@ router.post('/', function(req, res, next) {
   let SendMessageObject = req.body.SendMessageObject;
   let userIdArray = req.body.userIdArray;  
 
-    multicastClientSendMessage(userIdArray, SendMessageObject)
-    // multicastClientSendMessage(['U48d9b4ecccdca65e7b3f44a6910b48af'], SendMessageObject)  //test
+  if(test){
+    multicastClientSendMessage(['U48d9b4ecccdca65e7b3f44a6910b48af'], SendMessageObject)  //test
     .then((body)=>{
         console.log(body);
     },(e)=>{console.log(e)});
+  } else {
+    multicastClientSendMessage(userIdArray, SendMessageObject)
+    .then((body)=>{
+        console.log(body);
+    },(e)=>{console.log(e)});
+  }
 
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end('success');
@@ -126,16 +165,23 @@ router.post('/alert', function(req, res, next) {
         }
       },
     ];
-    multicastClientSendMessage(userIdArray, SendMessageObject)
-    // multicastClientSendMessage(['U48d9b4ecccdca65e7b3f44a6910b48af'], SendMessageObject)  //test
-    .then((body)=>{
-      console.log(body);
-      setAlertedAt();
-    },(e)=>{console.log(e)});
+    if(test){
+      multicastClientSendMessage(['U48d9b4ecccdca65e7b3f44a6910b48af'], SendMessageObject)  //test
+      .then((body)=>{
+          console.log(body);
+      },(e)=>{console.log(e)});
+    } else {
+      multicastClientSendMessage(userIdArray, SendMessageObject)
+      .then((body)=>{
+          console.log(body);
+      },(e)=>{console.log(e)});
+    }
+
   });
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end('success');
 });
+
 
 
 module.exports = router;

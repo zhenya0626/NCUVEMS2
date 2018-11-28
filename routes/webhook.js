@@ -137,11 +137,17 @@ const multicastMessageObjectExceptForOne = (userId, textMessage) => {
         type: 'text',
         text: textMessage
       }];
-      multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
-      // multicastMessageObject(['U48d9b4ecccdca65e7b3f44a6910b48af'], SendMessageObject)  //test
-      .then((body)=>{
-          console.log(body);
-      },(e)=>{console.log(e)});
+      if(test){
+        multicastMessageObject(['U48d9b4ecccdca65e7b3f44a6910b48af'], SendMessageObject)  //test
+        .then((body)=>{
+            console.log(body);
+        },(e)=>{console.log(e)});
+      } else {
+        multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
+        .then((body)=>{
+            console.log(body);
+        },(e)=>{console.log(e)});
+      }
   });
 }
 const PostAlert = function() {
@@ -258,36 +264,17 @@ router.post('/', function(req, res, next) {
   userId_log = userId;
   //メッセージが送られて来た場合
   let getRoomStatusSql = `select state from rooms where name='A202';`;
-    connection.query(getRoomStatusSql, (err, rows, fields) => {
-      if (err) throw err;
-      console.log('state', rows); 
-      let state_A202 = rows[0].state;
+        connection.query(getRoomStatusSql, (err, rows, fields) => {
+          if (err) throw err;
+          console.log('state', rows); 
+          let state_A202 = rows[0].state;
+          room_state_prev_log = state_A202;
+          room_state_next_log = state_A202;
 
-      let getUserStatusSql = `select state from user where userId = '${userId}';`;
-      connection.query(getUserStatusSql, (err, rows, fields) => {
-        if (err) throw err;
-        console.log('state', rows); 
-        let user_state = rows[0].state;
-        room_state_prev_log = state_A202;
-        room_state_next_log = state_A202;
-        user_state_prev_log = user_state;
-        user_state_next_log = user_state;
-        type_log = WebhookEventObject.type;
         if(WebhookEventObject.type === 'message'){
-          replyTokenArray.push(WebhookEventObject.replyToken);
-          
           if(WebhookEventObject.message.type === 'text'){
             message_log = WebhookEventObject.message.text;
-            if (WebhookEventObject.message.text === '送信') {
-              if (userId === 'U48d9b4ecccdca65e7b3f44a6910b48af' && state_A202 === 0) {
-                PostAlert().then((body)=>{
-                  console.log(body);
-                  setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, 1, user_state_prev_log, user_state_next_log, 'alert');
-                  setRoomStateSql(1, 1);
-                },(e)=>{console.log(e)});
-              }
-            } else if (WebhookEventObject.message.text === '登録'){
-              
+            if (WebhookEventObject.message.text === '登録'){
               let displayName = '';
               let pictureUrl = '';
 
@@ -317,133 +304,162 @@ router.post('/', function(req, res, next) {
                 }];
                 replyMessageObject(WebhookEventObject.replyToken, SendMessageObject)
                 .then((body)=>{
-                  setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, 1, user_state_prev_log, user_state_next_log, memo_log);
+                  setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, 0
+                  , 0, 0, memo_log);
                   console.log(body);
                 },(e)=>{console.log(e)});
               },(e)=>{console.log('getprofile noera-',e)});
-            } else if (
-                WebhookEventObject.message.text === '行かない' ||
-                WebhookEventObject.message.text === '消しに行く' ||
-                WebhookEventObject.message.text === '使用中だから' ||
-                WebhookEventObject.message.text === '消した' ||
-                WebhookEventObject.message.text === '消せなかった' ||
-                WebhookEventObject.message.text === 'それ以外'
-              ) {
-              switch(state_A202) {
-                case 0:
-                  replyOnlyTextMessage(WebhookEventObject, '現在は消灯されているまたは授業中なので消さなくて大丈夫です');
-                  setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
-                  break;
-                case 1:
-                  if(user_state === 0) {
-                    if (WebhookEventObject.message.text === '行かない'){
-                      SendMessageObject = [{
-                        "type": "template",
-                        "altText": "電気を消しに行かない理由を教えてください",
-                        "template": {
-                          "type": "confirm",
-                          "text": "電気を消しに行かない理由を教えてください",
-                          "actions": [
-                            {
-                              "type": "message",
-                              "label": "使用中だから",
-                              "text": "使用中だから"
-                            },
-                            {
-                              "type": "message",
-                              "label": "それ以外",
-                              "text": "それ以外"
-                            }
-                          ]
-                        }
-                      }];
-                      replyMessageObject(WebhookEventObject.replyToken, SendMessageObject)
-                      .then((body)=>{
-                        console.log(body);
-                        setUserStateSql(userId, 1);
-                        setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, 1, memo_log);
-                      },(e)=>{console.log(e)}); 
-                    }else if (WebhookEventObject.message.text === '消しに行く') {    
-                      SendMessageObject = [{
-                        "type": "template",
-                        "altText": "消した場合は『消した』 使っている人がいたなど消せなかった場合は『消せなかった』を選択してください",
-                        "template": {
-                          "type": "confirm",
-                          "text": "消した場合は『消した』 使っている人がいたなど消せなかった場合は『消せなかった』を選択してください",
-                          "actions": [
-                            {
-                              "type": "message",
-                              "label": "消せなかった",
-                              "text": "消せなかった"
-                            },
-                            {
-                              "type": "message",
-                              "label": "消した",
-                              "text": "消した"
-                            }
-                          ]
-                        }
-                      }];
-                      replyMessageObject(WebhookEventObject.replyToken, SendMessageObject)
-                      .then((body)=>{
-                        console.log(body);
-                        setUserStateSql(userId, 2);
-                        setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, 2, memo_log);
-                      },(e)=>{console.log(e)}); 
-                    }else {
-                      setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
-                    }
-                  } else if (user_state === 1) {
-                    if (WebhookEventObject.message.text === '使用中だから') {
-                      setPointAndSendThanksMessage(WebhookEventObject, userId, 1);
-                      multicastMessageObjectExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
-                      setRoomStateSql(1, 0);
-                      setAllUserStateSql(0);
-                      changeRoomConfirm(1,0);
-                      setLog(type_log, `${message_log}`, userId_log, 1, 0, 1, 0, memo_log);
-                    
-                    } else if('それ以外'){
-                      setUserStateSql(userId, 0);
-                      replyOnlyTextMessage(WebhookEventObject, 'ありがとうございました');
-                      setLog(type_log, `${message_log}`, userId_log, 1, 1, 2, 0, memo_log);
-                    } else {
-                      setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
-                    }
-                    setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
-                  } else if (user_state === 2) {
-                    if (WebhookEventObject.message.text === '消した'){
-                      replyOnlyTextMessage(WebhookEventObject, 'ありがとうございます! 電気の消灯を確認しております。２分以内にポイントが付与されます。');
-                      setUserStateSql(userId, 3);
-                      setRoomStateSql(1, 2);
-                      setLog(type_log, `${message_log}`, userId_log, 1, 2, 2, 3, memo_log);
-    
-                    }else if(WebhookEventObject.message.text === '消せなかった') {
-                      setPointAndSendThanksMessage(WebhookEventObject, userId, 3);
-                      multicastMessageObjectExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
-                      setRoomStateSql(1, 0);
-                      setAllUserStateSql(0);
-                      changeRoomConfirm(1,0);
-                      setLog(type_log, `${message_log}`, userId_log, 1, 0, 2, 0, memo_log);
-
-                    }else {
-                      setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
-                    }
-                  } else if (user_state === 3) {
-                    console.log('user_stateが3 ありえない!')
-                  }
-                  break;
-                case 2:
-                  replyOnlyTextMessage(WebhookEventObject,'現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にご確認ください。');
-                  setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
-                  break;
-                default:
-                  console.log('room status error');
-              }
+              return;
             }
-          } else {
-            console.log('not text')
-            setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, 'not text');
           }
+
+          let getUserStatusSql = `select state from user where userId = '${userId}';`;
+          connection.query(getUserStatusSql, (err, rows, fields) => {
+            if (err) throw err;
+            console.log('state', rows); 
+            let user_state = rows[0].state;
+           
+            user_state_prev_log = user_state;
+            user_state_next_log = user_state;
+            type_log = WebhookEventObject.type;
+            
+            replyTokenArray.push(WebhookEventObject.replyToken);
+            
+            if(WebhookEventObject.message.type === 'text'){
+              message_log = WebhookEventObject.message.text;
+              if (WebhookEventObject.message.text === '送信') {
+                if (userId === 'U48d9b4ecccdca65e7b3f44a6910b48af' && state_A202 === 0) {
+                  PostAlert().then((body)=>{
+                    console.log(body);
+                    setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, 1, user_state_prev_log, user_state_next_log, 'alert');
+                    setRoomStateSql(1, 1);
+                  },(e)=>{console.log(e)});
+                }
+              } else if (
+                  WebhookEventObject.message.text === '行かない' ||
+                  WebhookEventObject.message.text === '消しに行く' ||
+                  WebhookEventObject.message.text === '使用中だから' ||
+                  WebhookEventObject.message.text === '消した' ||
+                  WebhookEventObject.message.text === '消せなかった' ||
+                  WebhookEventObject.message.text === 'それ以外'
+                ) {
+                switch(state_A202) {
+                  case 0:
+                    replyOnlyTextMessage(WebhookEventObject, '現在は消灯されているまたは授業中なので消さなくて大丈夫です');
+                    setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
+                    break;
+                  case 1:
+                    if(user_state === 0) {
+                      if (WebhookEventObject.message.text === '行かない'){
+                        SendMessageObject = [{
+                          "type": "template",
+                          "altText": "電気を消しに行かない理由を教えてください",
+                          "template": {
+                            "type": "confirm",
+                            "text": "電気を消しに行かない理由を教えてください",
+                            "actions": [
+                              {
+                                "type": "message",
+                                "label": "使用中だから",
+                                "text": "使用中だから"
+                              },
+                              {
+                                "type": "message",
+                                "label": "それ以外",
+                                "text": "それ以外"
+                              }
+                            ]
+                          }
+                        }];
+                        replyMessageObject(WebhookEventObject.replyToken, SendMessageObject)
+                        .then((body)=>{
+                          console.log(body);
+                          setUserStateSql(userId, 1);
+                          setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, 1, memo_log);
+                        },(e)=>{console.log(e)}); 
+                      }else if (WebhookEventObject.message.text === '消しに行く') {    
+                        SendMessageObject = [{
+                          "type": "template",
+                          "altText": "消した場合は『消した』 使っている人がいたなど消せなかった場合は『消せなかった』を選択してください",
+                          "template": {
+                            "type": "confirm",
+                            "text": "消した場合は『消した』 使っている人がいたなど消せなかった場合は『消せなかった』を選択してください",
+                            "actions": [
+                              {
+                                "type": "message",
+                                "label": "消せなかった",
+                                "text": "消せなかった"
+                              },
+                              {
+                                "type": "message",
+                                "label": "消した",
+                                "text": "消した"
+                              }
+                            ]
+                          }
+                        }];
+                        replyMessageObject(WebhookEventObject.replyToken, SendMessageObject)
+                        .then((body)=>{
+                          console.log(body);
+                          setUserStateSql(userId, 2);
+                          setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, 2, memo_log);
+                        },(e)=>{console.log(e)}); 
+                      }else {
+                        setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
+                      }
+                    } else if (user_state === 1) {
+                      if (WebhookEventObject.message.text === '使用中だから') {
+                        setPointAndSendThanksMessage(WebhookEventObject, userId, 1);
+                        multicastMessageObjectExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
+                        setRoomStateSql(1, 0);
+                        setAllUserStateSql(0);
+                        changeRoomConfirm(1,0);
+                        setLog(type_log, `${message_log}`, userId_log, 1, 0, 1, 0, memo_log);
+                      
+                      } else if('それ以外'){
+                        setUserStateSql(userId, 0);
+                        replyOnlyTextMessage(WebhookEventObject, 'ありがとうございました');
+                        setLog(type_log, `${message_log}`, userId_log, 1, 1, 2, 0, memo_log);
+                      } else {
+                        setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
+                      }
+                      setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
+                    } else if (user_state === 2) {
+                      if (WebhookEventObject.message.text === '消した'){
+                        replyOnlyTextMessage(WebhookEventObject, 'ありがとうございます! 電気の消灯を確認しております。２分以内にポイントが付与されます。');
+                        setUserStateSql(userId, 3);
+                        setRoomStateSql(1, 2);
+                        setLog(type_log, `${message_log}`, userId_log, 1, 2, 2, 3, memo_log);
+      
+                      }else if(WebhookEventObject.message.text === '消せなかった') {
+                        setPointAndSendThanksMessage(WebhookEventObject, userId, 3);
+                        multicastMessageObjectExceptForOne(userId, '使用している人いたので電気を消さなくても大丈夫です。ありがとうございました。');
+                        setRoomStateSql(1, 0);
+                        setAllUserStateSql(0);
+                        changeRoomConfirm(1,0);
+                        setLog(type_log, `${message_log}`, userId_log, 1, 0, 2, 0, memo_log);
+
+                      }else {
+                        setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
+                      }
+                    } else if (user_state === 3) {
+                      console.log('user_stateが3 ありえない!')
+                    }
+                    break;
+                  case 2:
+                    replyOnlyTextMessage(WebhookEventObject,'現在電気を消してくれた方がいて、点灯状況の確認をしております。2分後にご確認ください。');
+                    setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
+                    break;
+                  default:
+                    console.log('room status error');
+                }
+              }
+            } else {
+              console.log('not text')
+              setLog(type_log, `${message_log}`, userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, 'not text');
+            }
+          });
+        
       }else if (WebhookEventObject.type === 'follow'){
         let displayName = '';
         let pictureUrl = '';
@@ -477,7 +493,7 @@ router.post('/', function(req, res, next) {
             console.log(body);
           },(e)=>{console.log(e)});
         },(e)=>{console.log('getprofile noera-',e)});
-        setLog(type_log, '', userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
+        setLog(type_log, '', userId_log, room_state_prev_log, room_state_next_log, 0, 0, memo_log);
       }else if (WebhookEventObject.type === 'unfollow'){
         let sql = `delete from user where userId='${userId}';`;
         
@@ -488,7 +504,6 @@ router.post('/', function(req, res, next) {
         setLog(type_log, '', userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
       }
     });
-  });
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end('success');
 });
