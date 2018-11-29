@@ -60,6 +60,12 @@ const multicastClientSendMessage = (users, SendMessageObject) => {
     req.end();
   });
 };
+const setAlertedAt = () => {
+  let setAlertedAtSql = `update rooms set alerted_at=CURRENT_TIMESTAMP where name='A202';`;
+    connection.query(setAlertedAtSql, (err, rows, fields) => {
+      if (err) throw err;
+    });
+}
 
 
 router.post('/', function(req, res, next) {
@@ -130,11 +136,13 @@ router.post('/alert', function(req, res, next) {
       multicastClientSendMessage(['U48d9b4ecccdca65e7b3f44a6910b48af'], SendMessageObject)  //test
       .then((body)=>{
           console.log(body);
+          setAlertedAt();
       },(e)=>{console.log(e)});
     } else {
       multicastClientSendMessage(userIdArray, SendMessageObject)
       .then((body)=>{
           console.log(body);
+          setAlertedAt();
       },(e)=>{console.log(e)});
     }
 
