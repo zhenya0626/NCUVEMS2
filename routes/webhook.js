@@ -122,6 +122,7 @@ const multicastMessageObject = (users, SendMessageObject) => {
   });
 };
 const multicastMessageObjectExceptForOne = (userId, textMessage) => {
+  let test = true;
   let sql3 = `select userId from user;`;
   connection.query(sql3, (err, rows, fields) => {
     if (err) throw err;
@@ -226,6 +227,12 @@ const changeRoomConfirm = function (roomId, confirm) {
       if (err) throw err;
   });
 };
+const setUsedAt = (roomId) => {
+  let setUsedAtSql = `update rooms set used_at=CURRENT_TIMESTAMP where id=${roomId};`;
+    connection.query(setUsedAtSql, (err, rows, fields) => {
+      if (err) throw err;
+    });
+}
 
 const setLog = (type, message, userId, room_state_prev, room_state_next, user_state_prev, user_state_next, memo='') => {
 
@@ -413,6 +420,7 @@ router.post('/', function(req, res, next) {
                         setRoomStateSql(1, 0);
                         setAllUserStateSql(0);
                         changeRoomConfirm(1,0);
+                        setUsedAt(1);
                         setLog(type_log, `${message_log}`, userId_log, 1, 0, 1, 0, memo_log);
                       
                       } else if('それ以外'){
@@ -436,6 +444,7 @@ router.post('/', function(req, res, next) {
                         setRoomStateSql(1, 0);
                         setAllUserStateSql(0);
                         changeRoomConfirm(1,0);
+                        setUsedAt(1);
                         setLog(type_log, `${message_log}`, userId_log, 1, 0, 2, 0, memo_log);
 
                       }else {
