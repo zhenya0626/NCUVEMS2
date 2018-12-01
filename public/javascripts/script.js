@@ -2,15 +2,17 @@
 let compare = {};
 let logData = {};
 let weekBar = {};
+let isUsed = false;
 
 //タイマーをセット
 function tm() {
     // tm = setInterval("location.reload()",1000*10);
-    onoff();
     fetchCompare();
     fetchLog();
     fetchWeekBar();
     displayChart();
+    fetchIsRoomisUsed();
+    onoff();
 }
 function isClassTime() {
     let now = new Date();
@@ -112,6 +114,27 @@ function Turned_Off_Time() {
     }
     return tmpObj
 }
+async function fetchIsRoomisUsed() {
+    $.ajax({
+        url:`https://ncuvems.sda.nagoya-cu.ac.jp/rooms/1/isUsed/`,
+        type:'GET',
+        async: false
+    })
+    // Ajaxリクエストが成功した時発動
+    .done( (data) => {
+        // $('#alert_area').html(data);
+        isUsed = data.isUsed;
+        console.log('isUsed', isUsed);
+    })
+    // Ajaxリクエストが失敗した時発動
+    .fail( (data) => {
+        console.log('error', data);
+    })
+    // Ajaxリクエストが成功・失敗どちらでも発動
+    .always( (data) => {
+        
+    });
+}
 async function fetchCompare() {
     $.ajax({
         url:`https://ncuvems.sda.nagoya-cu.ac.jp/permin/compare/`,
@@ -133,7 +156,6 @@ async function fetchCompare() {
         
     });
 }
-
 async function fetchLog() {
     $.ajax({
         url:`https://ncuvems.sda.nagoya-cu.ac.jp/permin/log/`,
@@ -178,7 +200,7 @@ async function fetchWeekBar() {
 }
 function onoff() {
 
-    var aiArray = [0, 0, 20, 0, 1, 100, 20, 0, 0, 0, 230, 0, 0, 0, 10];
+    var aiArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     for (var i = 0; i < 15; i++) {
         aiArray[i] = Number(ai_per[i]);
     }
@@ -190,7 +212,7 @@ function onoff() {
         
         if (aiArray[i] > 0) {
             $(".room div.CH" + (i + 1) + "").addClass("on");
-            if(i < 2 && !isClassTime().A202){
+            if(i < 2 && !isClassTime().A202 && !isUsed){
                 $(".room div.CH1").addClass("alert");
                 $(".room div.CH2").addClass("alert");
                 A202_ai += aiArray[i];
@@ -224,7 +246,7 @@ function onoff() {
     // if(A202_ai+A203_ai+factory_ai>0){  
     if(A202_ai>0){  
         $("#alert_area").removeClass("display_none");
-        if(A202_ai>0){    
+        if(A202_ai>0 && !isClassTime().A202 && !isUsed){    
             $("#alert_area_text_A202").removeClass("display_none"); 
         } else {
             $("#alert_area_text_A202").addClass("display_none");
