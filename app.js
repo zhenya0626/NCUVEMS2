@@ -13,6 +13,7 @@ var webhookRouter = require('./routes/webhook');
 var pushRouter = require('./routes/push');
 var perminRouter = require('./routes/permin');
 var roomsRouter = require('./routes/rooms');
+var logsRouter = require('./routes/logs');
 var app = express();
 
 
@@ -35,6 +36,7 @@ app.use('/webhook', webhookRouter);
 app.use('/push', pushRouter);
 app.use('/permin', perminRouter);
 app.use('/rooms', roomsRouter);
+app.use('/logs', logsRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
