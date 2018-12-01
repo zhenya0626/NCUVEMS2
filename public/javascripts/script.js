@@ -2,15 +2,17 @@
 let compare = {};
 let logData = {};
 let weekBar = {};
+let isUsed = false;
 
 //タイマーをセット
 function tm() {
     // tm = setInterval("location.reload()",1000*10);
-    onoff();
     fetchCompare();
     fetchLog();
     fetchWeekBar();
     displayChart();
+    fetchIsRoomisUsed();
+    onoff();
 }
 function isClassTime() {
     let now = new Date();
@@ -18,7 +20,6 @@ function isClassTime() {
     let dayOfWeek = now.getDay();  // youbi 0=nichi 1=getu 2=ka 3=sui 4=moku 5=kin 6=do
     let hour = now.getHours() ;	// 時
     let minute = now.getMinutes() ;	// 分
-
     let tmpObj = {
         A202: false,
         A203: false,
@@ -26,45 +27,65 @@ function isClassTime() {
     };
     // 2=ka
     if(dayOfWeek === 2) {
-        if ( hour>=9 && (hour<=10 && minute<=30) ){
+        if ( (hour==8 && minute>=57) && (hour==10 && minute<=33)){
             tmpObj.A202 = true;
-            tmpObj.A203 = true;
-        } else if ( (hour>=10  && minute>=40)&& (hour<=12 && minute<=10) ) {
+            // tmpObj.A203 = true;
+        } else if ( (hour==10  && minute>=37) || hour==11 || (hour==12 && minute<=13) ) {
             tmpObj.A202 = true;
-            tmpObj.A203 = true;
-        } else if ( (hour>=13  && minute>=0)&& (hour<=14 && minute<=30) ) {
+            // tmpObj.A203 = true;
+        } else if ( (hour==12 && minute>=57) || (hour==14 && minute<=33) ) {
 
-        } else if ( (hour>=14  && minute>=40)&& (hour<=16 && minute<=10) ) {
+        } else if ( (hour==14  && minute>=37) || hour==15 || (hour==16 && minute<=13) ) {
 
         }
     // 3=sui
     } else if(dayOfWeek === 3) {
-        if ( hour>=9 && (hour<=10 && minute<=30) ){
+        if ( (hour==8 && minute>=57) && (hour==10 && minute<=33)){
+            // tmpObj.A203 = true;
+        } else if ( (hour==10  && minute>=37) || hour==11 || (hour==12 && minute<=13) ) {  
             tmpObj.A203 = true;
-        } else if ( (hour>=10  && minute>=40)&& (hour<=12 && minute<=10) ) {  
-            tmpObj.A203 = true;
-        } else if ( (hour>=13  && minute>=0)&& (hour<=14 && minute<=30) ) {
+        } else if ( (hour==12 && minute>=57) || (hour==14 && minute<=33) ) {
             tmpObj.A202 = true;
-            tmpObj.A203 = true;
-        } else if ( (hour>=14  && minute>=40)&& (hour<=16 && minute<=10) ) {
-            tmpObj.A203 = true;
+            // tmpObj.A203 = true;
+        } else if ( (hour==14  && minute>=37) || hour==15 || (hour==16 && minute<=13) ) {
+            // tmpObj.A203 = true;
         }  
     // 4=moku 
     } else if(dayOfWeek === 3) {
-        if ( hour>=9 && (hour<=10 && minute<=30) ){
+        if ( (hour==8 && minute>=57) && (hour==10 && minute<=33)){
 
-        } else if ( (hour>=10  && minute>=40)&& (hour<=12 && minute<=10) ) {  
+        } else if ( (hour==10  && minute>=37) || hour==11 || (hour==12 && minute<=13) ) {  
 
-        } else if ( (hour>=13  && minute>=0)&& (hour<=14 && minute<=30) ) {
+        } else if ( (hour==12 && minute>=57) || (hour==14 && minute<=33) ) {
             tmpObj.A202 = true;
-        } else if ( (hour>=14  && minute>=40)&& (hour<=16 && minute<=10) ) {
+        } else if ( (hour==14  && minute>=37) || hour==15 || (hour==16 && minute<=13) ) {
             tmpObj.A202 = true;
         }   
     }
-
     return tmpObj
 }
 
+async function fetchIsRoomisUsed() {
+    $.ajax({
+        url:`https://ncuvems.sda.nagoya-cu.ac.jp/rooms/1/isUsed/`,
+        type:'GET',
+        async: false
+    })
+    // Ajaxリクエストが成功した時発動
+    .done( (data) => {
+        // $('#alert_area').html(data);
+        isUsed = data.isUsed;
+        console.log('isUsed', isUsed);
+    })
+    // Ajaxリクエストが失敗した時発動
+    .fail( (data) => {
+        console.log('error', data);
+    })
+    // Ajaxリクエストが成功・失敗どちらでも発動
+    .always( (data) => {
+        
+    });
+}
 async function fetchCompare() {
     $.ajax({
         url:`https://ncuvems.sda.nagoya-cu.ac.jp/permin/compare/`,
@@ -86,7 +107,6 @@ async function fetchCompare() {
         
     });
 }
-
 async function fetchLog() {
     $.ajax({
         url:`https://ncuvems.sda.nagoya-cu.ac.jp/permin/log/`,
@@ -131,7 +151,7 @@ async function fetchWeekBar() {
 }
 function onoff() {
 
-    var aiArray = [0, 0, 20, 0, 1, 100, 20, 0, 0, 0, 230, 0, 0, 0, 10];
+    var aiArray = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     for (var i = 0; i < 15; i++) {
         aiArray[i] = Number(ai_per[i]);
     }
@@ -143,13 +163,13 @@ function onoff() {
         
         if (aiArray[i] > 0) {
             $(".room div.CH" + (i + 1) + "").addClass("on");
-            if(i < 2 && !isClassTime().A203){
+            if(i < 2 && !isClassTime().A202 && !isUsed){
                 $(".room div.CH1").addClass("alert");
                 $(".room div.CH2").addClass("alert");
                 A202_ai += aiArray[i];
             }
-            if(i === 2 && !isClassTime().A202){
-                $(".room div.CH3").addClass("alert");
+            if(i === 2 && !isClassTime().A203){
+                // $(".room div.CH3").addClass("alert");s
                 A203_ai += aiArray[i];
             }
 
@@ -175,15 +195,15 @@ function onoff() {
         }
     }
     // if(A202_ai+A203_ai+factory_ai>0){  
-    if(A202_ai+A203_ai>0){  
+    if(A202_ai>0){  
         $("#alert_area").removeClass("display_none");
-        if(A202_ai>0){    
+        if(A202_ai>0 && !isClassTime().A202 && !isUsed){    
             $("#alert_area_text_A202").removeClass("display_none"); 
         } else {
             $("#alert_area_text_A202").addClass("display_none");
         }
         if(A203_ai>0){
-            $("#alert_area_text_A203").removeClass("display_none");
+            // $("#alert_area_text_A203").removeClass("display_none");
         } else {
             $("#alert_area_text_A203").addClass("display_none");
         }
