@@ -27,93 +27,44 @@ function isClassTime() {
     };
     // 2=ka
     if(dayOfWeek === 2) {
-        if ( hour==9 && (hour==10 && minute<=30) ){
+        if ( (hour==8 && minute>=57) && (hour==10 && minute<=33)){
             tmpObj.A202 = true;
             // tmpObj.A203 = true;
-        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10) ) {
+        } else if ( (hour==10  && minute>=37) || hour==11 || (hour==12 && minute<=13) ) {
             tmpObj.A202 = true;
             // tmpObj.A203 = true;
-        } else if ( hour=13 || (hour==14 && minute<=30) ) {
+        } else if ( (hour==12 && minute>=57) || (hour==14 && minute<=33) ) {
 
-        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
+        } else if ( (hour==14  && minute>=37) || hour==15 || (hour==16 && minute<=13) ) {
 
         }
     // 3=sui
     } else if(dayOfWeek === 3) {
-        if ( hour==9 && (hour==10 && minute<=30) ){
+        if ( (hour==8 && minute>=57) && (hour==10 && minute<=33)){
             // tmpObj.A203 = true;
-        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10) ) {  
+        } else if ( (hour==10  && minute>=37) || hour==11 || (hour==12 && minute<=13) ) {  
             tmpObj.A203 = true;
-        } else if ( hour=13 || (hour==14 && minute<=30) ) {
+        } else if ( (hour==12 && minute>=57) || (hour==14 && minute<=33) ) {
             tmpObj.A202 = true;
             // tmpObj.A203 = true;
-        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
+        } else if ( (hour==14  && minute>=37) || hour==15 || (hour==16 && minute<=13) ) {
             // tmpObj.A203 = true;
         }  
     // 4=moku 
     } else if(dayOfWeek === 3) {
-        if ( hour==9 && (hour==10 && minute<=30) ){
+        if ( (hour==8 && minute>=57) && (hour==10 && minute<=33)){
 
-        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10) ) {  
+        } else if ( (hour==10  && minute>=37) || hour==11 || (hour==12 && minute<=13) ) {  
 
-        } else if ( hour=13 || (hour==14 && minute<=30) ) {
+        } else if ( (hour==12 && minute>=57) || (hour==14 && minute<=33) ) {
             tmpObj.A202 = true;
-        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
+        } else if ( (hour==14  && minute>=37) || hour==15 || (hour==16 && minute<=13) ) {
             tmpObj.A202 = true;
         }   
     }
     return tmpObj
 }
-function Turned_Off_Time() {
-    let now = new Date();
-    console.log('now.getDay', now.getDay());
-    let dayOfWeek = now.getDay();  // youbi 0=nichi 1=getu 2=ka 3=sui 4=moku 5=kin 6=do
-    let hour = now.getHours() ;	// 時
-    let minute = now.getMinutes() ;	// 分
-    let tmpObj = {
-        A202: false,
-        A203: false,
-        factry: false
-    };
-    // 2=ka
-    if(dayOfWeek === 2) {
-        if ( hour==9 && (hour==10 && minute<=30) ){
-            tmpObj.A202 = true;
-            // tmpObj.A203 = true;
-        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10) ) {
-            tmpObj.A202 = true;
-            // tmpObj.A203 = true;
-        } else if ( hour=13 || (hour==14 && minute<=30) ) {
 
-        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
-
-        }
-    // 3=sui
-    } else if(dayOfWeek === 3) {
-        if ( hour==9 && (hour==10 && minute<=30) ){
-            // tmpObj.A203 = true;
-        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10) ) {  
-            tmpObj.A203 = true;
-        } else if ( hour=13 || (hour==14 && minute<=30) ) {
-            tmpObj.A202 = true;
-            // tmpObj.A203 = true;
-        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
-            // tmpObj.A203 = true;
-        }  
-    // 4=moku 
-    } else if(dayOfWeek === 3) {
-        if ( hour==9 && (hour==10 && minute<=30) ){
-
-        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10) ) {  
-
-        } else if ( hour=13 || (hour==14 && minute<=30) ) {
-            tmpObj.A202 = true;
-        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
-            tmpObj.A202 = true;
-        }   
-    }
-    return tmpObj
-}
 async function fetchIsRoomisUsed() {
     $.ajax({
         url:`https://ncuvems.sda.nagoya-cu.ac.jp/rooms/1/isUsed/`,
