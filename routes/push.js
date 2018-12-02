@@ -11,7 +11,7 @@ const connection = mysql.createConnection({
 });
 connection.connect();
 
-let test = true;
+let test = false;
 const HOST = 'api.line.me'; 
 const REPLY_PATH = '/v2/bot/message/reply';//リプライ用
 const PUSH_PATH = '/v2/bot/message/push';

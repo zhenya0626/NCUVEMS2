@@ -122,7 +122,7 @@ const multicastMessageObject = (users, SendMessageObject) => {
   });
 };
 const multicastMessageObjectExceptForOne = (userId, textMessage) => {
-  let test = true;
+  let test = false;
   let sql3 = `select userId from user;`;
   connection.query(sql3, (err, rows, fields) => {
     if (err) throw err;
