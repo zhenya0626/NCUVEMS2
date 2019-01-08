@@ -18,23 +18,21 @@ connection.connect();
 /* GET users listing. */
 router.get('/', function(req, res, next) {
 
-  let sql = `select 
-    logs.id,
+  let sql = `select distinct logs.created_at,
     logs.is_server,
     logs.type,logs.message,
     user.displayName,
     logs.room_state_prev as rp,
     logs.room_state_next as rn ,
-    logs.user_state_prev as up,
-    logs.user_state_next as un,
-    logs.memo,
-    logs.created_at from logs left outer join user on logs.userId = user.userId order by logs.id desc;`;
+    logs.memo
+    from logs left outer join user on logs.userId = user.userId order by logs.created_at DESC;`;
   connection.query(sql, (err, rows, fields) => {
     if (err) throw err;
     console.log('test_user', rows);
-    res.render('logs', {
-      logs: JSON.stringify(rows),
-    });
+    res.send(rows);
+    // res.render('logs', {
+    //   logs: JSON.stringify(rows),
+    // });
   });
 });
 

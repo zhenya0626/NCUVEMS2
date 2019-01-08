@@ -503,12 +503,12 @@ router.post('/', function(req, res, next) {
         },(e)=>{console.log('getprofile noera-',e)});
         setLog(type_log, '', userId_log, room_state_prev_log, room_state_next_log, 0, 0, memo_log);
       }else if (WebhookEventObject.type === 'unfollow'){
-        let sql = `delete from user where userId='${userId}';`;
+        // let sql = `delete from user where userId='${userId}';`;
         
-        connection.query(sql, (err, rows, fields) => {
-          if (err) throw err;
-          console.log('test_user', rows);
-        });
+        // connection.query(sql, (err, rows, fields) => {
+        //   if (err) throw err;
+        //   console.log('test_user', rows);
+        // });
         setLog(type_log, '', userId_log, room_state_prev_log, room_state_next_log, user_state_prev_log, user_state_next_log, memo_log);
       }
     });
